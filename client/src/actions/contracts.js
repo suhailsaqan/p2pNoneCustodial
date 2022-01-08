@@ -38,6 +38,7 @@ export const attemptCreateContract = (contract) => async (
 ) => {
   dispatch(createContractRequest);
   try {
+    
     const newContract = await createContract(contract);
     dispatch(createContractSuccess(newContract));
   } catch (error) {

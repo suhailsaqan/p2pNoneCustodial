@@ -32,7 +32,7 @@ class CreateContractForm extends React.Component {
   render() {
     return (
       <Form
-        // loading={this.contracts.isFetching}
+        loading={this.props.isFetching}
         onSubmit={this.props.handleSubmit(this.onSubmit)}
         wide
       >

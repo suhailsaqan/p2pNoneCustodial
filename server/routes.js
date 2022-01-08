@@ -7,7 +7,7 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/contract/:id", contracts.getContracts);
+router.get("/contract", contracts.getContracts);
 router.post("/contract", contracts.createContract);
 
 // Test routers

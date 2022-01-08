@@ -43,7 +43,7 @@ const VariableField = (field) => {
             rows="6"
             error={field.meta.touched && !!field.meta.error}
             placeholder={field.label}
-            value={field.defaultValue}
+            // value={field.defaultValue}
           />
         </InputWrapper>
       );
@@ -61,7 +61,7 @@ const VariableField = (field) => {
             type={field.type}
             placeholder={field.label}
             autoComplete="off"
-            value={field.defaultValue}
+            // value={field.defaultValue}
           />
         </InputWrapper>
       );

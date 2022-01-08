@@ -1,5 +1,4 @@
-// const baseUrl = 'https://forum-server.netlify.app/.netlify/functions/app';
-const baseUrl = "http://localhost:9000/";
+const baseUrl = "http://localhost:9000";
 
 const methods = {
   get: async function (endpoint, token = null) {
@@ -66,9 +65,10 @@ const methods = {
 };
 
 export async function getContracts(id) {
-  return await methods.get(`contract/${id}`);
+  return await methods.get(`contract?id=${id}`);
 }
 
 export async function createContract(body) {
+  console.log(body);
   return await methods.post("contract", body);
 }
