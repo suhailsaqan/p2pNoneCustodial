@@ -1,8 +1,8 @@
 const Contract = require("../models/contract");
 
-exports.getContracts = async (req, res, next, id) => {
+exports.getContracts = async (req, res, next) => {
   try {
-    const contract = await Contract.findById(id);
+    const contract = await Contract.findById(req.params.id);
     if (!contract)
       return res.status(404).json({ message: "contract not found" });
     res.json(contract);

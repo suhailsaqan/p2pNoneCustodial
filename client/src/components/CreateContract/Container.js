@@ -5,8 +5,8 @@ import { attemptCreateContract } from "../../actions/contracts";
 import CreateContractForm from "./Component";
 
 const mapStateToProps = (state) => ({
-  isFetching: state.posts.isFetching,
-  contract: state.posts.newContract,
+  // isFetching: state.contract.isFetching,
+  contract: state.contracts.newContract,
   form: state.form.createContract,
 });
 

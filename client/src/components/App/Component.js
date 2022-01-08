@@ -8,7 +8,6 @@ import HeaderContainer from "../Header/Container";
 import ErrorNotificationContainer from "../ErrorNotification/Container";
 import CreateContractContainer from "../CreateContract/Container";
 import OracleContainer from "../Oracle/Container";
-import Home from "../Home";
 
 const App = (props) => (
   <ThemeProvider theme={theme(props.dark)}>
@@ -20,7 +19,7 @@ const App = (props) => (
         <Switch>
           <Route path="/create" component={CreateContractContainer} />
           <Route path="/oracle" component={OracleContainer} />
-          <Route path="/" component={Home} />
+          <Route path="/" component={CreateContractContainer} />
         </Switch>
       </>
     </Router>

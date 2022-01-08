@@ -1,6 +1,5 @@
 import React from "react";
 import { Field } from "redux-form";
-import categories from "../../categories";
 import Form from "../shared/form/Form";
 import renderField from "../shared/form/renderField";
 import SubmitButton from "../shared/form/SubmitButton";
@@ -23,7 +22,7 @@ const ContractTemplates = [
 class CreateContractForm extends React.Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     const { contract, history } = this.props;
-    if (contract) history.push(`/oracle/${contract.id}`);
+    if (contract) history.push(`/${contract.id}`);
   }
 
   onSubmit = (contract) => {
@@ -33,7 +32,7 @@ class CreateContractForm extends React.Component {
   render() {
     return (
       <Form
-        loading={this.props.isFetching}
+        // loading={this.contracts.isFetching}
         onSubmit={this.props.handleSubmit(this.onSubmit)}
         wide
       >
@@ -47,180 +46,180 @@ class CreateContractForm extends React.Component {
         {this.props.form.values.type === "trade" && (
           <div>
             <Field
-              name="contract name"
-              label="contract_name"
+              label="contract name"
+              name="contract_name"
               type="text"
               component={renderField}
-              initialValues="Bob trades with Alice, $100 in bitcoin for $100 in usd"
+              defaultValue="Bob trades with Alice, $100 in bitcoin for $100 in usd"
             />
             <Field
-              name="contract description"
-              label="description"
+              label="contract description"
+              name="description"
               type="textarea"
               component={renderField}
-              initialValues="The 1st party submits an invoice for $100 and hands the 2nd party $100 usd. The 2nd party pays the invoice and the oracle settles that invoice. This completes the contract in the happy case. There are two unhappy cases. If the 2nd party doesn't send the bitcoins, the contract expires on the settlement date. No one loses any money but no one is happy. If the 1st party doesn't hand over the usd, the oracle cancels the 1st party's invoice. No one loses any money but no one is happy."
+              defaultValue="The 1st party submits an invoice for $100 and hands the 2nd party $100 usd. The 2nd party pays the invoice and the oracle settles that invoice. This completes the contract in the happy case. There are two unhappy cases. If the 2nd party doesn't send the bitcoins, the contract expires on the settlement date. No one loses any money but no one is happy. If the 1st party doesn't hand over the usd, the oracle cancels the 1st party's invoice. No one loses any money but no one is happy."
             />
             <Field
-              name="settlement date"
-              label="settlement_date"
+              label="settlement date"
+              name="settlement_date"
               type="text"
               component={renderField}
-              initialValues="2018-01-01"
+              defaultValue="2018-01-01"
             />
             <Field
-              name="first party's role"
-              label="first_party_role"
+              label="first party's role"
+              name="first_party_role"
               type="text"
               component={renderField}
-              initialValues="Bitcoin buyer"
+              defaultValue="Bitcoin buyer"
             />
             <Field
-              name="second party's role"
-              label="second_party_role"
+              label="second party's role"
+              name="second_party_role"
               type="text"
               component={renderField}
-              initialValues="Bitcoin seller"
+              defaultValue="Bitcoin seller"
             />
             <Field
-              name="how much will the first party send to the second party via bitcoin?"
-              label="first_party_amount"
+              label="how much will the first party send to the second party via bitcoin?"
+              name="first_party_amount"
               type="text"
               component={renderField}
-              initialValues="0"
+              defaultValue="0"
             />
             <Field
-              name="how much will the second party send to the first party via bitcoin?"
-              label="second_party_amount"
+              label="how much will the second party send to the first party via bitcoin?"
+              name="second_party_amount"
               type="text"
               component={renderField}
-              initialValues="100"
+              defaultValue="100"
             />
             <Field
-              name="oracle fee"
-              label="oracle_fee"
+              label="oracle fee"
+              name="oracle_fee"
               type="text"
               component={renderField}
-              initialValues="0"
+              defaultValue="0"
             />
           </div>
         )}
         {this.props.form.values.type === "bet" && (
           <div>
             <Field
-              name="contract name"
-              label="contract_name"
+              label="contract name"
+              name="contract_name"
               type="text"
               component={renderField}
-              initialValues="Bob trades with Alice, $100 in bitcoin for $100 in usd"
+              defaultValue="Bob trades with Alice, $100 in bitcoin for $100 in usd"
             />
             <Field
-              name="contract description"
-              label="description"
+              label="contract description"
+              name="description"
               type="textarea"
               component={renderField}
-              initialValues="The 1st party submits an invoice for $100 and hands the 2nd party $100 usd. The 2nd party pays the invoice and the oracle settles that invoice. This completes the contract in the happy case. There are two unhappy cases. If the 2nd party doesn't send the bitcoins, the contract expires on the settlement date. No one loses any money but no one is happy. If the 1st party doesn't hand over the usd, the oracle cancels the 1st party's invoice. No one loses any money but no one is happy."
+              defaultValue="The 1st party submits an invoice for $100 and hands the 2nd party $100 usd. The 2nd party pays the invoice and the oracle settles that invoice. This completes the contract in the happy case. There are two unhappy cases. If the 2nd party doesn't send the bitcoins, the contract expires on the settlement date. No one loses any money but no one is happy. If the 1st party doesn't hand over the usd, the oracle cancels the 1st party's invoice. No one loses any money but no one is happy."
             />
             <Field
-              name="settlement date"
-              label="settlement_date"
+              label="settlement date"
+              name="settlement_date"
               type="text"
               component={renderField}
-              initialValues="2018-01-01"
+              defaultValue="2018-01-01"
             />
             <Field
-              name="first party's role"
-              label="first_party_role"
+              label="first party's role"
+              name="first_party_role"
               type="text"
               component={renderField}
-              initialValues="Bitcoin buyer"
+              defaultValue="Bitcoin buyer"
             />
             <Field
-              name="second party's role"
-              label="second_party_role"
+              label="second party's role"
+              name="second_party_role"
               type="text"
               component={renderField}
-              initialValues="Bitcoin seller"
+              defaultValue="Bitcoin seller"
             />
             <Field
-              name="how much will the first party send to the second party via bitcoin?"
-              label="first_party_amount"
+              label="how much will the first party send to the second party via bitcoin?"
+              name="first_party_amount"
               type="text"
               component={renderField}
-              initialValues="0"
+              defaultValue="0"
             />
             <Field
-              name="how much will the second party send to the first party via bitcoin?"
-              label="second_party_amount"
+              label="how much will the second party send to the first party via bitcoin?"
+              name="second_party_amount"
               type="text"
               component={renderField}
-              initialValues="100"
+              defaultValue="100"
             />
             <Field
-              name="oracle fee"
-              label="oracle_fee"
+              label="oracle fee"
+              name="oracle_fee"
               type="text"
               component={renderField}
-              initialValues="0"
+              defaultValue="0"
             />
           </div>
         )}
         {this.props.form.values.type === "loan" && (
           <div>
             <Field
-              name="contract name"
-              label="contract_name"
+              label="contract name"
+              name="contract_name"
               type="text"
               component={renderField}
-              initialValues="Bob trades with Alice, $100 in bitcoin for $100 in usd"
+              defaultValue="Bob trades with Alice, $100 in bitcoin for $100 in usd"
             />
             <Field
-              name="contract description"
-              label="description"
+              label="contract description"
+              name="description"
               type="textarea"
               component={renderField}
-              initialValues="The 1st party submits an invoice for $100 and hands the 2nd party $100 usd. The 2nd party pays the invoice and the oracle settles that invoice. This completes the contract in the happy case. There are two unhappy cases. If the 2nd party doesn't send the bitcoins, the contract expires on the settlement date. No one loses any money but no one is happy. If the 1st party doesn't hand over the usd, the oracle cancels the 1st party's invoice. No one loses any money but no one is happy."
+              defaultValue="The 1st party submits an invoice for $100 and hands the 2nd party $100 usd. The 2nd party pays the invoice and the oracle settles that invoice. This completes the contract in the happy case. There are two unhappy cases. If the 2nd party doesn't send the bitcoins, the contract expires on the settlement date. No one loses any money but no one is happy. If the 1st party doesn't hand over the usd, the oracle cancels the 1st party's invoice. No one loses any money but no one is happy."
             />
             <Field
-              name="settlement date"
-              label="settlement_date"
+              label="settlement date"
+              name="settlement_date"
               type="text"
               component={renderField}
-              initialValues="2018-01-01"
+              defaultValue="2018-01-01"
             />
             <Field
-              name="first party's role"
-              label="first_party_role"
+              label="first party's role"
+              name="first_party_role"
               type="text"
               component={renderField}
-              initialValues="Bitcoin buyer"
+              defaultValue="Bitcoin buyer"
             />
             <Field
-              name="second party's role"
-              label="second_party_role"
+              label="second party's role"
+              name="second_party_role"
               type="text"
               component={renderField}
-              initialValues="Bitcoin seller"
+              defaultValue="Bitcoin seller"
             />
             <Field
-              name="how much will the first party send to the second party via bitcoin?"
-              label="first_party_amount"
+              label="how much will the first party send to the second party via bitcoin?"
+              name="first_party_amount"
               type="text"
               component={renderField}
-              initialValues="0"
+              defaultValue="0"
             />
             <Field
-              name="how much will the second party send to the first party via bitcoin?"
-              label="second_party_amount"
+              label="how much will the second party send to the first party via bitcoin?"
+              name="second_party_amount"
               type="text"
               component={renderField}
-              initialValues="100"
+              defaultValue="100"
             />
             <Field
-              name="oracle fee"
-              label="oracle_fee"
+              label="oracle fee"
+              name="oracle_fee"
               type="text"
               component={renderField}
-              initialValues="0"
+              defaultValue="0"
             />
           </div>
         )}

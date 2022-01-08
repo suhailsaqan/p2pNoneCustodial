@@ -1,14 +1,14 @@
-import React from 'react';
-import InputWrapper from './InputWrapper';
-import Label from './Label';
-import Error from './Error';
-import SelectWrapper from './SelectWrapper';
-import Input from './Input';
-import RadioGroup from './RadioGroup';
+import React from "react";
+import InputWrapper from "./InputWrapper";
+import Label from "./Label";
+import Error from "./Error";
+import SelectWrapper from "./SelectWrapper";
+import Input from "./Input";
+import RadioGroup from "./RadioGroup";
 
-const VariableField = field => {
+const VariableField = (field) => {
   switch (field.type) {
-    case 'select':
+    case "select":
       return (
         <InputWrapper>
           <Label>{field.label}</Label>
@@ -16,21 +16,21 @@ const VariableField = field => {
             <Error>{field.meta.error}</Error>
           )}
           <SelectWrapper>
-            <Input {...field.input} as='select' type='select'>
+            <Input {...field.input} as="select" type="select">
               {field.children}
             </Input>
           </SelectWrapper>
         </InputWrapper>
       );
 
-    case 'radiogroup':
+    case "radiogroup":
       return (
         <InputWrapper>
           <RadioGroup field={field} />
         </InputWrapper>
       );
 
-    case 'textarea':
+    case "textarea":
       return (
         <InputWrapper>
           <Label>{field.label}</Label>
@@ -39,10 +39,11 @@ const VariableField = field => {
           )}
           <Input
             {...field.input}
-            as='textarea'
-            rows='6'
+            as="textarea"
+            rows="6"
             error={field.meta.touched && !!field.meta.error}
             placeholder={field.label}
+            value={field.defaultValue}
           />
         </InputWrapper>
       );
@@ -59,14 +60,15 @@ const VariableField = field => {
             error={field.meta.touched && !!field.meta.error}
             type={field.type}
             placeholder={field.label}
-            autoComplete='off'
+            autoComplete="off"
+            value={field.defaultValue}
           />
         </InputWrapper>
       );
   }
 };
 
-const renderField = field => {
+const renderField = (field) => {
   return <VariableField {...field} />;
 };
 

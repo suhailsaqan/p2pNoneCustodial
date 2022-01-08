@@ -1,5 +1,5 @@
 // const baseUrl = 'https://forum-server.netlify.app/.netlify/functions/app';
-const baseUrl = "http://localhost:9000/.netlify/functions/app";
+const baseUrl = "http://localhost:9000/";
 
 const methods = {
   get: async function (endpoint, token = null) {
