@@ -1,6 +1,6 @@
 // import { connect } from "react-redux";
 // import { compose } from "redux";
-// import { fetchPost } from "../../actions/posts"; //change
+// import { fetchContracts } from "../../actions/posts"; //change
 // import Oracle from "./Component";
 
 // export const mapStateToProps = (state) => ({
@@ -8,7 +8,7 @@
 //   post: state.posts.post,
 // });
 
-// const mapDispatchToProps = { fetchPost }; //change
+// const mapDispatchToProps = { fetchContracts }; //change
 
 // const enhance = compose(connect(mapStateToProps, mapDispatchToProps));
 

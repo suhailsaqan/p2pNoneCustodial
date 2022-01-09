@@ -8,6 +8,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/contract", contracts.getContracts);
+router.get("/contract/:id", contracts.getContract);
 router.post("/contract", contracts.createContract);
 
 // Test routers

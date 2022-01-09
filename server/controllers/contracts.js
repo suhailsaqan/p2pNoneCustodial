@@ -1,16 +1,26 @@
 const Contract = require("../models/contract");
 
-exports.getContracts = async (req, res, next) => {
+exports.getContract = async (req, res, next) => {
   try {
-    const contract = await Contract.findById(req.query.id);
-    if (contract) {
+    const contract = await Contract.findById(req.params.id);
+    if (contract !== null) {
       return res.status(200).json(contract);
     }
+    return res.status(404).json({ message: "contract not found" });
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
+  }
+};
+
+exports.getContracts = async (req, res, next) => {
+  try {
     const contracts = await Contract.find();
-    if (contracts) {
+    if (contracts !== null) {
       return res.json(contracts);
     }
-    return res.status(404).json({ message: "contract not found" });
+    return res.status(404).json({ message: "no contracts exist" });
   } catch (err) {
     if (err.name === "CastError")
       return res.status(400).json({ message: "invalid contract id" });

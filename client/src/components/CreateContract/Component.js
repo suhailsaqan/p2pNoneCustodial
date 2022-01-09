@@ -22,7 +22,7 @@ const ContractTemplates = [
 class CreateContractForm extends React.Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     const { contract, history } = this.props;
-    if (contract) history.push(`/${contract.id}`);
+    if (contract) history.push(`/${contract._id}`);
   }
 
   onSubmit = (contract) => {

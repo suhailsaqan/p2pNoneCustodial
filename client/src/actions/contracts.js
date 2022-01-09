@@ -1,23 +1,44 @@
-import { getContracts, createContract } from "../util/api";
+import { getContract, getContracts, createContract } from "../util/api";
 
 export const FETCH_CONTRACT_REQUEST = "FETCH_CONTRACT_REQUEST";
 export const FETCH_CONTRACT_SUCCESS = "FETCH_CONTRACT_SUCCESS";
 export const FETCH_CONTRACT_ERROR = "FETCH_CONTRACT_ERROR";
 
 const fetchContractRequest = { type: FETCH_CONTRACT_REQUEST };
-const fetchContractSuccess = (contracts) => ({
+const fetchContractSuccess = (contract) => ({
   type: FETCH_CONTRACT_SUCCESS,
-  contracts,
+  contract,
 });
 const fetchContractError = (error) => ({ type: FETCH_CONTRACT_ERROR, error });
 
-export const fetchContracts = (id = "") => async (dispatch) => {
+export const fetchContract = (id = "") => async (dispatch) => {
   dispatch(fetchContractRequest);
   try {
-    const contracts = await getContracts(id);
+    const contracts = await getContract(id);
     dispatch(fetchContractSuccess(contracts));
   } catch (error) {
     dispatch(fetchContractError(error));
+  }
+};
+
+export const FETCH_CONTRACTS_REQUEST = "FETCH_CONTRACTS_REQUEST";
+export const FETCH_CONTRACTS_SUCCESS = "FETCH_CONTRACTS_SUCCESS";
+export const FETCH_CONTRACTS_ERROR = "FETCH_CONTRACTS_ERROR";
+
+const fetchContractsRequest = { type: FETCH_CONTRACTS_REQUEST };
+const fetchContractsSuccess = (contracts) => ({
+  type: FETCH_CONTRACT_SUCCESS,
+  contracts,
+});
+const fetchContractsError = (error) => ({ type: FETCH_CONTRACT_ERROR, error });
+
+export const fetchContracts = () => async (dispatch) => {
+  dispatch(fetchContractsRequest);
+  try {
+    const contracts = await getContracts();
+    dispatch(fetchContractsSuccess(contracts));
+  } catch (error) {
+    dispatch(fetchContractsError(error));
   }
 };
 
@@ -38,7 +59,6 @@ export const attemptCreateContract = (contract) => async (
 ) => {
   dispatch(createContractRequest);
   try {
-    
     const newContract = await createContract(contract);
     dispatch(createContractSuccess(newContract));
   } catch (error) {

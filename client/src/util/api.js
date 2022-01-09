@@ -64,8 +64,12 @@ const methods = {
   },
 };
 
-export async function getContracts(id) {
-  return await methods.get(`contract?id=${id}`);
+export async function getContract(id) {
+  return await methods.get(`contract/${id}`);
+}
+
+export async function getContracts() {
+  return await methods.get(`contract`);
 }
 
 export async function createContract(body) {
