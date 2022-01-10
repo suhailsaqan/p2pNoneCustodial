@@ -3,13 +3,15 @@ const router = require("express").Router();
 
 router.get("/", (req, res) => {
   res.json({
-    something: "says hi",
+    Jesus_Christ: "Lord and Savior",
   });
 });
 
 router.get("/contract", contracts.getContracts);
 router.get("/contract/:id", contracts.getContract);
 router.post("/contract", contracts.createContract);
+
+router.get("/status/:id/:party", contracts.getStatus);
 
 // Test routers
 router.get("/test", (req, res) => {

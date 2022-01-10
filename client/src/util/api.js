@@ -74,5 +74,9 @@ export async function getContracts() {
 
 export async function createContract(body) {
   console.log(body);
-  return await methods.post("contract", body);
+  return await methods.post(`contract`, body);
+}
+
+export async function getStatus(id, party) {
+  return await methods.get(`status/${id}/${party}`);
 }

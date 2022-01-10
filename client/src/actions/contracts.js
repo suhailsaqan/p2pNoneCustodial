@@ -1,4 +1,9 @@
-import { getContract, getContracts, createContract } from "../util/api";
+import {
+  getContract,
+  getContracts,
+  createContract,
+  getStatus,
+} from "../util/api";
 
 export const FETCH_CONTRACT_REQUEST = "FETCH_CONTRACT_REQUEST";
 export const FETCH_CONTRACT_SUCCESS = "FETCH_CONTRACT_SUCCESS";
@@ -63,5 +68,26 @@ export const attemptCreateContract = (contract) => async (
     dispatch(createContractSuccess(newContract));
   } catch (error) {
     dispatch(createContractError(error));
+  }
+};
+
+export const FETCH_STATUS_REQUEST = "FETCH_STATUS_REQUEST";
+export const FETCH_STATUS_SUCCESS = "FETCH_STATUS_SUCCESS";
+export const FETCH_STATUS_ERROR = "FETCH_STATUS_ERROR";
+
+const fetchStatusRequest = { type: FETCH_STATUS_REQUEST };
+const fetchStatusSuccess = (status) => ({
+  type: FETCH_STATUS_SUCCESS,
+  status,
+});
+const fetchStatusError = (error) => ({ type: FETCH_STATUS_ERROR, error });
+
+export const fetchStatus = (id = "", party = "") => async (dispatch) => {
+  dispatch(fetchStatusRequest);
+  try {
+    const status = await getStatus(id, party);
+    dispatch(fetchStatusSuccess(status));
+  } catch (error) {
+    dispatch(fetchStatusError(error));
   }
 };

@@ -42,11 +42,10 @@ const cancelInvoice = async ({ hash }) => {
   }
 };
 
-const lookupInvoice = async ({ r_hash_str, r_hash }) => {
+const lookupInvoice = async (r_hash_str, r_hash) => {
   try {
     let request = {
       r_hash_str: r_hash_str,
-      r_hash: r_hash,
     };
     const response = invoices.lookupInvoice(request);
     return response;

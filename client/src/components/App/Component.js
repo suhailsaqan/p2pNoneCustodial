@@ -18,8 +18,14 @@ const App = (props) => (
         <Route component={ErrorNotificationContainer} />
         <Switch>
           <Route path="/create" component={CreateContractContainer} />
-          <Route path="/oracle" component={OracleContainer} />
           <Route path="/" component={CreateContractContainer} />
+          <Route
+            exact
+            path="/oracle/:id"
+            render={({ match, history }) => (
+              <OracleContainer id={match.params.id} history={history} />
+            )}
+          />
         </Switch>
       </>
     </Router>

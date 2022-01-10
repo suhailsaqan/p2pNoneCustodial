@@ -8,6 +8,9 @@ import {
   CREATE_CONTRACT_REQUEST,
   CREATE_CONTRACT_SUCCESS,
   CREATE_CONTRACT_ERROR,
+  FETCH_STATUS_REQUEST,
+  FETCH_STATUS_SUCCESS,
+  FETCH_STATUS_ERROR,
 } from "../actions/contracts";
 
 const initialState = { isFetching: false, items: [] };
@@ -34,6 +37,13 @@ export default (state = initialState, action) => {
       return { ...state, isFetching: false, newContract: action.contract };
     case CREATE_CONTRACT_ERROR:
       return { ...state, isFetching: false, error: action.error };
+
+    case FETCH_STATUS_REQUEST:
+      return { ...state, isFetching: true, status: null, newStatus: null };
+    case FETCH_STATUS_SUCCESS:
+      return { ...state, isFetching: false, status: action.status };
+    case FETCH_STATUS_ERROR:
+      return { ...state, isFetching: false };
 
     default:
       return state;

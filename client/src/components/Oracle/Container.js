@@ -1,17 +1,17 @@
-// import { connect } from "react-redux";
-// import { compose } from "redux";
-// import { fetchContracts } from "../../actions/posts"; //change
-// import Oracle from "./Component";
+import { connect } from "react-redux";
+import { compose } from "redux";
+import { fetchContract, fetchStatus } from "../../actions/contracts";
+import Oracle from "./Component";
 
-// export const mapStateToProps = (state) => ({
-//   isFetching: state.posts.isFetching,
-//   post: state.posts.post,
-// });
+export const mapStateToProps = (state) => ({
+  isFetching: state.contract.isFetching,
+  post: state.contract.contract,
+});
 
-// const mapDispatchToProps = { fetchContracts }; //change
+const mapDispatchToProps = { fetchContract, fetchStatus };
 
-// const enhance = compose(connect(mapStateToProps, mapDispatchToProps));
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps));
 
-// const OracleContainer = enhance(Oracle);
+const OracleContainer = enhance(Oracle);
 
-// export default OracleContainer;
+export default OracleContainer;
