@@ -1,4 +1,4 @@
-const { invoices } = require("./connect");
+const { invoices, lightning } = require("./connect");
 
 const getInvoice = async ({ expiry, hash, amount }) => {
   try {
@@ -42,12 +42,12 @@ const cancelInvoice = async ({ hash }) => {
   }
 };
 
-const lookupInvoice = async (r_hash_str, r_hash) => {
+const lookupInvoice = async (r_hash_str) => {
   try {
     let request = {
       r_hash_str: r_hash_str,
     };
-    const response = invoices.lookupInvoice(request);
+    const response = lightning.lookupInvoice(request);
     return response;
   } catch (e) {
     console.log(e);

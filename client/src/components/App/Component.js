@@ -18,7 +18,7 @@ const App = (props) => (
         <Route component={ErrorNotificationContainer} />
         <Switch>
           <Route path="/create" component={CreateContractContainer} />
-          <Route path="/" component={CreateContractContainer} />
+          {/* <Route path="/" component={CreateContractContainer} /> */}
           <Route
             exact
             path="/oracle/:id"

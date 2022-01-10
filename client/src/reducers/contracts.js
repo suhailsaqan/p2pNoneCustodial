@@ -8,9 +8,15 @@ import {
   CREATE_CONTRACT_REQUEST,
   CREATE_CONTRACT_SUCCESS,
   CREATE_CONTRACT_ERROR,
-  FETCH_STATUS_REQUEST,
-  FETCH_STATUS_SUCCESS,
-  FETCH_STATUS_ERROR,
+  // FETCH_STATUS_REQUEST,
+  // FETCH_STATUS_SUCCESS,
+  // FETCH_STATUS_ERROR,
+  FETCH_STATUS_1_REQUEST,
+  FETCH_STATUS_1_SUCCESS,
+  FETCH_STATUS_1_ERROR,
+  FETCH_STATUS_2_REQUEST,
+  FETCH_STATUS_2_SUCCESS,
+  FETCH_STATUS_2_ERROR,
 } from "../actions/contracts";
 
 const initialState = { isFetching: false, items: [] };
@@ -20,7 +26,7 @@ export default (state = initialState, action) => {
     case FETCH_CONTRACT_REQUEST:
       return { ...state, isFetching: true, contract: null, newContract: null };
     case FETCH_CONTRACT_SUCCESS:
-      return { ...state, isFetching: false, items: action.contract };
+      return { ...state, isFetching: false, contract: action.contract };
     case FETCH_CONTRACT_ERROR:
       return { ...state, isFetching: false };
 
@@ -38,11 +44,25 @@ export default (state = initialState, action) => {
     case CREATE_CONTRACT_ERROR:
       return { ...state, isFetching: false, error: action.error };
 
-    case FETCH_STATUS_REQUEST:
-      return { ...state, isFetching: true, status: null, newStatus: null };
-    case FETCH_STATUS_SUCCESS:
-      return { ...state, isFetching: false, status: action.status };
-    case FETCH_STATUS_ERROR:
+    // case FETCH_STATUS_REQUEST:
+    //   return { ...state, isFetching: true, status: null};
+    // case FETCH_STATUS_SUCCESS:
+    //   return { ...state, isFetching: false, status: action.status };
+    // case FETCH_STATUS_ERROR:
+    //   return { ...state, isFetching: false };
+
+    case FETCH_STATUS_1_REQUEST:
+      return { ...state, isFetching: true, status_1: null };
+    case FETCH_STATUS_1_SUCCESS:
+      return { ...state, isFetching: false, status_1: action.status };
+    case FETCH_STATUS_1_ERROR:
+      return { ...state, isFetching: false };
+
+    case FETCH_STATUS_2_REQUEST:
+      return { ...state, isFetching: true, status_2: null };
+    case FETCH_STATUS_2_SUCCESS:
+      return { ...state, isFetching: false, status_2: action.status };
+    case FETCH_STATUS_2_ERROR:
       return { ...state, isFetching: false };
 
     default:

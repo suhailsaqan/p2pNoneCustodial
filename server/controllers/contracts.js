@@ -4,7 +4,7 @@ const {
   settleInvoice,
   cancelInvoice,
   lookupInvoice,
-} = require("../controllers/contracts");
+} = require("../lightning/invoices");
 
 const STATUS_TYPES = {
   NO_INTERACTION: "No interaction yet",
@@ -75,16 +75,20 @@ exports.getStatus = async (req, res, next) => {
     const { id, party } = req.params;
     let status = null;
 
+    if (parseInt(party) !== 1 && parseInt(party) !== 2) {
+      return res.status(404).json({ message: "party can only be 1 or 2" });
+    }
+
     const contract = await Contract.findById(id);
     if (contract == null) {
       return res.status(404).json({ message: "contract not found" });
     }
 
-    if (int(party) == 1 && str(contract.first_party_original) == "") {
+    if (parseInt(party) == 1 && contract.first_party_original == undefined) {
       status = STATUS_TYPES.NO_INTERACTION;
     }
-    if (int(party) == 1 && str(contract.first_party_original) !== "") {
-      pmthash = str(contract.first_party_pmthash);
+    if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
+      pmthash = contract.first_party_pmthash;
       response = await lookupInvoice(pmthash);
       pmtstatus = response.state;
       if (pmtstatus == 3) {
@@ -97,20 +101,20 @@ exports.getStatus = async (req, res, next) => {
         status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
       }
     }
-    if (int(party) == 2 && str(contract.second_party_original == "")) {
-      if (str(contract.first_party_original) == "") {
+    if (parseInt(party) == 2 && contract.second_party_original == undefined) {
+      if (contract.first_party_original == undefined) {
         status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
       } else {
         status = STATUS_TYPES.NO_INTERACTION;
       }
     }
-    if (int(party) == 2 && str(contract.second_party_original) !== "") {
-      if (str(contract.first_party_original) == "") {
+    if (parseInt(party) == 2 && contract.second_party_original !== undefined) {
+      if (contract.first_party_original == undefined) {
         status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
       } else {
         status = STATUS_TYPES.NO_INTERACTION;
       }
-      pmthash = str(contract.second_party_pmthash);
+      pmthash = contract.second_party_pmthash;
       response = await lookupInvoice(pmthash);
       pmtstatus = response.state;
       if (pmtstatus == 3) {

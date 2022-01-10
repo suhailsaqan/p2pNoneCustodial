@@ -4,8 +4,10 @@ import { fetchContract, fetchStatus } from "../../actions/contracts";
 import Oracle from "./Component";
 
 export const mapStateToProps = (state) => ({
-  isFetching: state.contract.isFetching,
-  post: state.contract.contract,
+  isFetching: state.contracts.isFetching,
+  contract: state.contracts.contract,
+  status_1: state.contracts.status_1,
+  status_2: state.contracts.status_2,
 });
 
 const mapDispatchToProps = { fetchContract, fetchStatus };

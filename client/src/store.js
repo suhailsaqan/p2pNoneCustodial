@@ -10,6 +10,6 @@ import themeMiddleware from "./middleware/theme";
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default createStore(
-  combineReducers({ contracts, error, theme }),
+  combineReducers({ form, contracts, error, theme }),
   composeEnhancers(applyMiddleware(thunk, errorMiddleware, themeMiddleware))
 );
