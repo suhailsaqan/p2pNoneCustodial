@@ -4,6 +4,7 @@ const {
   settleInvoice,
   cancelInvoice,
   lookupInvoice,
+  sendPayment,
 } = require("../lightning/invoices");
 
 const STATUS_TYPES = {
@@ -13,6 +14,12 @@ const STATUS_TYPES = {
   CONTRACT_SETTLED: "Settled",
   WAITING_ON_OTHER_PARTY: "Waiting on other party",
 };
+
+function toHexString(byteArray) {
+  return Array.from(byteArray, function (byte) {
+    return ("0" + (byte & 0xff).toString(16)).slice(-2);
+  }).join("");
+}
 
 exports.getContract = async (req, res, next) => {
   try {
@@ -130,5 +137,71 @@ exports.getStatus = async (req, res, next) => {
     return res.status(201).json(status);
   } catch (err) {
     next(err);
+  }
+};
+
+exports.settleContract = async (req, res, next) => {
+  try {
+    // TODO: check the status of the contract to be able to settle it
+    const { id, party } = req.body;
+
+    const contract = await Contract.findById(req.params.id);
+    if (contract == null) {
+      return res.status(404).json({ message: "contract not found" });
+    }
+
+    if (parseInt(party) == 1) {
+      pmthash = contract.first_party_pmthash;
+      response = await lookupInvoice(pmthash);
+      pmtstatus = response.state;
+
+      if (pmtstatus == 3) {
+        original_invoice = contract.first_party_original;
+        call = sendPayment(original_invoice, 1000, 15);
+        response = [];
+        call.on("data", function (data) {
+          // A response was received from the server.
+          console.log(data);
+          response.push(data);
+        });
+        call.on("end", function () {
+          // The server has closed the stream.
+          console.log("end");
+          cont = true;
+        });
+        if (cont) {
+          pmtstatus = response[2].state;
+          if (parseInt(pmtstatus) == 1) {
+            payment_preimage_bytes = fullresponse[2].preimage;
+
+            let request = {
+              preimage: payment_preimage_bytes,
+            };
+            invoices.settleInvoice(request, function (err, response) {
+              console.log(response);
+              return res.status(400).json({ message: "invalid contract id" });
+            });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
+  }
+};
+
+exports.cancelContract = async (req, res, next) => {
+  try {
+    const contracts = await Contract.find();
+    if (contracts !== null) {
+      return res.json(contracts);
+    }
+    return res.status(404).json({ message: "no contracts exist" });
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
   }
 };

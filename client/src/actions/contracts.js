@@ -3,6 +3,8 @@ import {
   getContracts,
   createContract,
   getStatus,
+  settleContract,
+  cancelContract,
 } from "../util/api";
 
 export const FETCH_CONTRACT_REQUEST = "FETCH_CONTRACT_REQUEST";
@@ -114,15 +116,62 @@ export const fetchStatus = (id = "", party = "") => async (dispatch) => {
     request = fetchStatus2Request;
     success = fetchStatus2Success;
     error = fetchStatus2Error;
+  } else {
+    return "party can only be 1 or 2";
   }
-  // else {
-  // dispatch(error("party can only be 1 or 2"));
-  // }
   dispatch(request);
   try {
     const status = await getStatus(id, party);
     dispatch(success(status));
   } catch (err) {
     dispatch(error(err));
+  }
+};
+
+export const SETTLE_CONTRACT_REQUEST = "SETTLE_CONTRACT_REQUEST";
+export const SETTLE_CONTRACT_SUCCESS = "SETTLE_CONTRACT_SUCCESS";
+export const SETTLE_CONTRACT_ERROR = "SETTLE_CONTRACT_ERROR";
+
+const settleContractRequest = { type: SETTLE_CONTRACT_REQUEST };
+const settleContractSuccess = (contract) => ({
+  type: SETTLE_CONTRACT_SUCCESS,
+  contract,
+});
+const settleContractError = (error) => ({ type: SETTLE_CONTRACT_ERROR, error });
+
+export const attemptSettleContract = (id, party) => async (
+  dispatch,
+  getState
+) => {
+  dispatch(settleContractRequest);
+  try {
+    const contract = await settleContract(id, party);
+    dispatch(settleContractSuccess(contract));
+  } catch (error) {
+    dispatch(settleContractError(error));
+  }
+};
+
+export const CANCEL_CONTRACT_REQUEST = "CANCEL_CONTRACT_REQUEST";
+export const CANCEL_CONTRACT_SUCCESS = "CANCEL_CONTRACT_SUCCESS";
+export const CANCEL_CONTRACT_ERROR = "CANCEL_CONTRACT_ERROR";
+
+const cancelContractRequest = { type: CANCEL_CONTRACT_REQUEST };
+const cancelContractSuccess = (contract) => ({
+  type: CANCEL_CONTRACT_SUCCESS,
+  contract,
+});
+const cancelContractError = (error) => ({ type: CANCEL_CONTRACT_ERROR, error });
+
+export const attemptCancelContract = (id, party) => async (
+  dispatch,
+  getState
+) => {
+  dispatch(cancelContractRequest);
+  try {
+    const contract = await cancelContract(id, party);
+    dispatch(cancelContractSuccess(contract));
+  } catch (error) {
+    dispatch(cancelContractError(error));
   }
 };

@@ -80,3 +80,11 @@ export async function createContract(body) {
 export async function getStatus(id, party) {
   return await methods.get(`status/${id}/${party}`);
 }
+
+export async function settleContract(id, party) {
+  return await methods.post(`contract`, { id, party });
+}
+
+export async function cancelContract(id, party) {
+  return await methods.post(`contract`, { id, party });
+}

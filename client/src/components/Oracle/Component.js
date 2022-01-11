@@ -9,6 +9,7 @@ import {
   CancelButtonContainer,
   SettleButtonContainer,
 } from "./Button/Container";
+import contracts from "../../reducers/contracts";
 
 class Oracle extends React.Component {
   componentDidMount() {
@@ -42,11 +43,12 @@ class Oracle extends React.Component {
         />
         {this.props.token && <CommentFormContainer id={post.id} />}
         <PostDetailCommentSection comments={post.comments} /> */}
-        <CancelButtonContainer />
-        <SettleButtonContainer />
 
-        <CancelButtonContainer />
-        <SettleButtonContainer />
+        <SettleButtonContainer id={contract._id} status={status_1} party={1} />
+        <CancelButtonContainer id={contract._id} status={status_1} party={1} />
+
+        <CancelButtonContainer id={contract._id} status={status_2} party={2} />
+        <SettleButtonContainer id={contract._id} status={status_2} party={2} />
       </>
     );
   }

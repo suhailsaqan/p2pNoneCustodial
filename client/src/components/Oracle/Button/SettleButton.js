@@ -1,18 +1,26 @@
 import React from "react";
 import styled from "styled-components/macro";
 import Button from "../../shared/Button";
+import { STATUS_TYPES } from "../../shared/ContractStatusTypes";
 
 const SettleButtonStyle = styled(Button)`
   align-self: flex-end;
+  color: white;
+  border: 1px solid black;
+  border-radius: 40px;
+  margin-bottom: 20px;
+  background-color: green;
 
   :disabled {
-    background-color: #cccccc;
-    color: #666666;
+    opacity: 0.3;
+    cursor: not-allowed;
   }
 `;
 
-let disable = (props) => {
-  if (props.status_1 === "settled" || props.status_2 === "settled") {
+let disable = (status) => {
+  if (status === STATUS_TYPES.WAITING_ON_OTHER_PARTY) {
+    return true;
+  } else if (status === STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT) {
     return false;
   } else {
     return true;
@@ -22,9 +30,9 @@ let disable = (props) => {
 const SettleButton = (props) => (
   <SettleButtonStyle
     onClick={() => {
-      props.fetchStatus("dc8669574cba4e16b0cbaf398a1c9a90", 1);
+      props.settleContract(props.id, props.party);
     }}
-    disabled={disable(props)}
+    disabled={disable(props.status)}
   >
     Settle
   </SettleButtonStyle>

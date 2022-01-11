@@ -1,4 +1,4 @@
-const { invoices, lightning } = require("./connect");
+const { invoices, lightning, router } = require("./connect");
 
 const getInvoice = async ({ expiry, hash, amount }) => {
   try {
@@ -55,4 +55,25 @@ const lookupInvoice = async (r_hash_str) => {
   }
 };
 
-module.exports = { getInvoice, settleInvoice, cancelInvoice, lookupInvoice };
+const sendPayment = async (payment_request, timeout_seconds, fee_limit_sat) => {
+  try {
+    let request = {
+      payment_request: payment_request,
+      timeout_seconds: timeout_seconds,
+      fee_limit_sat: fee_limit_sat,
+    };
+    let call = router.sendPayment(request);
+    return call;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
+};
+
+module.exports = {
+  getInvoice,
+  settleInvoice,
+  cancelInvoice,
+  lookupInvoice,
+  sendPayment,
+};
