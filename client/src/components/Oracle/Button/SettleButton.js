@@ -4,7 +4,6 @@ import Button from "../../shared/Button";
 import { STATUS_TYPES } from "../../shared/ContractStatusTypes";
 
 const SettleButtonStyle = styled(Button)`
-  align-self: flex-end;
   color: white;
   border: 1px solid black;
   border-radius: 40px;
@@ -30,7 +29,7 @@ let disable = (status) => {
 const SettleButton = (props) => (
   <SettleButtonStyle
     onClick={() => {
-      props.settleContract(props.id, props.party);
+      props.attemptSettleContract(props.id, props.party);
     }}
     disabled={disable(props.status)}
   >

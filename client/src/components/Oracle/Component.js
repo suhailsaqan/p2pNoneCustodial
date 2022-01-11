@@ -1,15 +1,28 @@
 import React from "react";
+import styled from "styled-components/macro";
 import LoadingIndicatorBox from "../shared/LoadingIndicator/Box";
 import Empty from "../shared/Empty";
-// import PostDetailPost from "./Post";
-// import PostDetailInfoBarContainer from "./InfoBar/Container";
-// import CommentFormContainer from "../CommentForm/Container";
-// import PostDetailCommentSection from "./CommentSection";
+import { Link } from "react-router-dom";
 import {
   CancelButtonContainer,
   SettleButtonContainer,
 } from "./Button/Container";
 import contracts from "../../reducers/contracts";
+
+const Wrapper = styled.div`
+  align-items: center;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-direction: column;
+`;
+
+const Grid = styled.div`
+  display: inline-block;
+  align-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
 
 class Oracle extends React.Component {
   componentDidMount() {
@@ -33,8 +46,50 @@ class Oracle extends React.Component {
     if (this.props.isFetching) return <LoadingIndicatorBox />;
     if (!contract) return <Empty />;
     return (
-      <>
-        {/* <PostDetailPost {...post} />
+      <Wrapper>
+        <p>{contract.description}</p>
+        <Grid>
+          <p>First Party</p>
+          <p>Current Status: {status_1}</p>
+          <Link to={`/party/${contract._id}/1`}>Page</Link>
+          <div>
+            <SettleButtonContainer
+              id={contract._id}
+              status={status_1}
+              party={1}
+            />
+            <CancelButtonContainer
+              id={contract._id}
+              status={status_1}
+              party={1}
+            />
+          </div>
+        </Grid>
+        <Grid>
+          <p>Second Party</p>
+          <p>Current Status: {status_2}</p>
+          <Link to={`/party/${contract._id}/2`}>Page</Link>
+          <div>
+            <SettleButtonContainer
+              id={contract._id}
+              status={status_2}
+              party={2}
+            />
+            <CancelButtonContainer
+              id={contract._id}
+              status={status_2}
+              party={2}
+            />
+          </div>
+        </Grid>
+      </Wrapper>
+    );
+  }
+}
+
+export default Oracle;
+{
+  /* <PostDetailPost {...post} />
         <PostDetailInfoBarContainer
           id={post.id}
           views={post.views}
@@ -42,16 +97,5 @@ class Oracle extends React.Component {
           author={post.author}
         />
         {this.props.token && <CommentFormContainer id={post.id} />}
-        <PostDetailCommentSection comments={post.comments} /> */}
-
-        <SettleButtonContainer id={contract._id} status={status_1} party={1} />
-        <CancelButtonContainer id={contract._id} status={status_1} party={1} />
-
-        <CancelButtonContainer id={contract._id} status={status_2} party={2} />
-        <SettleButtonContainer id={contract._id} status={status_2} party={2} />
-      </>
-    );
-  }
+        <PostDetailCommentSection comments={post.comments} /> */
 }
-
-export default Oracle;

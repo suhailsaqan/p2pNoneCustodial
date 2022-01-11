@@ -30,7 +30,7 @@ let disable = (status) => {
 const CancelButton = (props) => (
   <CancelButtonStyle
     onClick={() => {
-      props.cancelContract(props.id, props.party);
+      props.attemptCancelContract(props.id, props.party);
     }}
     disabled={disable(props.status)}
   >

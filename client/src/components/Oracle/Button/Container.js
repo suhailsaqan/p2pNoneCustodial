@@ -1,9 +1,12 @@
 import { connect } from "react-redux";
-import { cancelContract, settleContract } from "../../../actions/contracts";
+import {
+  attemptCancelContract,
+  attemptSettleContract,
+} from "../../../actions/contracts";
 import CancelButton from "./CancelButton";
 import SettleButton from "./SettleButton";
 
-const mapDispatchToProps = { cancelContract, settleContract };
+const mapDispatchToProps = { attemptCancelContract, attemptSettleContract };
 
 const CancelButtonContainer = connect(null, mapDispatchToProps)(CancelButton);
 const SettleButtonContainer = connect(null, mapDispatchToProps)(SettleButton);

@@ -13,8 +13,8 @@ router.post("/contract", contracts.createContract);
 
 router.get("/status/:id/:party", contracts.getStatus);
 
-router.get("/cancel", contracts.cancelContract);
 router.get("/settle", contracts.settleContract);
+router.get("/cancel", contracts.cancelContract);
 
 // Test routers
 router.get("/test", (req, res) => {

@@ -82,9 +82,9 @@ export async function getStatus(id, party) {
 }
 
 export async function settleContract(id, party) {
-  return await methods.post(`contract`, { id, party });
+  return await methods.post(`settle`, { id, party });
 }
 
 export async function cancelContract(id, party) {
-  return await methods.post(`contract`, { id, party });
+  return await methods.post(`cancel`, { id, party });
 }

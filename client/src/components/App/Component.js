@@ -8,6 +8,7 @@ import HeaderContainer from "../Header/Container";
 import ErrorNotificationContainer from "../ErrorNotification/Container";
 import CreateContractContainer from "../CreateContract/Container";
 import OracleContainer from "../Oracle/Container";
+import PartyContainer from "../Party/Container";
 
 const App = (props) => (
   <ThemeProvider theme={theme(props.dark)}>
@@ -18,7 +19,13 @@ const App = (props) => (
         <Route component={ErrorNotificationContainer} />
         <Switch>
           <Route path="/create" component={CreateContractContainer} />
-          {/* <Route path="/" component={CreateContractContainer} /> */}
+          <Route
+            exact
+            path="/party/:id/:party"
+            render={({ match }) => (
+              <PartyContainer id={match.params.id} party={match.params.party} />
+            )}
+          />
           <Route
             exact
             path="/oracle/:id"

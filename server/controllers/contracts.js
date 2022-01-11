@@ -145,7 +145,7 @@ exports.settleContract = async (req, res, next) => {
     // TODO: check the status of the contract to be able to settle it
     const { id, party } = req.body;
 
-    const contract = await Contract.findById(req.params.id);
+    const contract = await Contract.findById(id);
     if (contract == null) {
       return res.status(404).json({ message: "contract not found" });
     }
@@ -174,13 +174,47 @@ exports.settleContract = async (req, res, next) => {
           if (parseInt(pmtstatus) == 1) {
             payment_preimage_bytes = fullresponse[2].preimage;
 
-            let request = {
-              preimage: payment_preimage_bytes,
-            };
-            invoices.settleInvoice(request, function (err, response) {
-              console.log(response);
-              return res.status(400).json({ message: "invalid contract id" });
-            });
+            await settleInvoice(
+              payment_preimage_bytes,
+              function (err, response) {
+                console.log(response);
+                return res.status(201).json(contract);
+              }
+            );
+          }
+        }
+      }
+    } else if (parseInt(party) == 2) {
+      pmthash = contract.second_party_pmthash;
+      response = await lookupInvoice(pmthash);
+      pmtstatus = response.state;
+
+      if (pmtstatus == 3) {
+        original_invoice = contract.second_party_original;
+        call = await sendPayment(original_invoice, 1000, 15);
+        response = [];
+        call.on("data", function (data) {
+          // A response was received from the server.
+          console.log(data);
+          response.push(data);
+        });
+        call.on("end", function () {
+          // The server has closed the stream.
+          console.log("end");
+          cont = true;
+        });
+        if (cont) {
+          pmtstatus = response[2].state;
+          if (parseInt(pmtstatus) == 1) {
+            payment_preimage_bytes = fullresponse[2].preimage;
+
+            await settleInvoice(
+              payment_preimage_bytes,
+              function (err, response) {
+                console.log(response);
+                return res.status(201).json(contract);
+              }
+            );
           }
         }
       }
@@ -194,11 +228,22 @@ exports.settleContract = async (req, res, next) => {
 
 exports.cancelContract = async (req, res, next) => {
   try {
-    const contracts = await Contract.find();
-    if (contracts !== null) {
-      return res.json(contracts);
+    const { id, party } = req.body;
+
+    const contract = await Contract.findById(id);
+    if (contract == null) {
+      return res.status(404).json({ message: "contract not found" });
     }
-    return res.status(404).json({ message: "no contracts exist" });
+
+    if (parseInt(party) == 1) {
+      pmthash = contract.first_party_pmthash;
+    } else if (parseInt(party) == 2) {
+      pmthash = contract.second_party_pmthash;
+    }
+    await cancelInvoice(pmthash, function (err, response) {
+      console.log(response);
+      return res.status(201).json(contract);
+    });
   } catch (err) {
     if (err.name === "CastError")
       return res.status(400).json({ message: "invalid contract id" });

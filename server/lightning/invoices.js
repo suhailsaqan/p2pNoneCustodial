@@ -16,7 +16,7 @@ const getInvoice = async ({ expiry, hash, amount }) => {
   }
 };
 
-const settleInvoice = async ({ preimage }) => {
+const settleInvoice = async (preimage) => {
   try {
     let request = {
       preimage: preimage,
@@ -29,7 +29,7 @@ const settleInvoice = async ({ preimage }) => {
   }
 };
 
-const cancelInvoice = async ({ hash }) => {
+const cancelInvoice = async (hash) => {
   try {
     let request = {
       payment_hash: hash,
