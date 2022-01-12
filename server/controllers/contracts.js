@@ -5,6 +5,7 @@ const {
   cancelInvoice,
   lookupInvoice,
   sendPayment,
+  decodePayReq,
 } = require("../lightning/invoices");
 
 const STATUS_TYPES = {
@@ -218,6 +219,8 @@ exports.settleContract = async (req, res, next) => {
           }
         }
       }
+    } else {
+      return res.status(400).json({ message: "party can only be 1 or 2" });
     }
   } catch (err) {
     if (err.name === "CastError")
@@ -228,6 +231,7 @@ exports.settleContract = async (req, res, next) => {
 
 exports.cancelContract = async (req, res, next) => {
   try {
+    // TODO: check the status of the contract to be able to settle it
     const { id, party } = req.body;
 
     const contract = await Contract.findById(id);
@@ -239,11 +243,88 @@ exports.cancelContract = async (req, res, next) => {
       pmthash = contract.first_party_pmthash;
     } else if (parseInt(party) == 2) {
       pmthash = contract.second_party_pmthash;
+    } else {
+      return res.status(400).json({ message: "party can only be 1 or 2" });
     }
     await cancelInvoice(pmthash, function (err, response) {
       console.log(response);
       return res.status(201).json(contract);
     });
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
+  }
+};
+
+exports.addInvoice = async (req, res, next) => {
+  try {
+    // TODO: check the status of the contract to be able to add invoice
+    var { id, party, invoice } = req.body;
+    invoice = invoice["invoice"];
+
+    const contract = await Contract.findById(id);
+    if (contract == null) {
+      return res.status(404).json({ message: "contract not found" });
+    }
+
+    // pricefeed = requests.get(
+    //   "https://api.kraken.com/0/public/Ticker?pair=XBTUSD"
+    // );
+    // krakenprice = pricefeed.json().get("result").get("XXBTZUSD").get("a")[0];
+    // sats_per_dollar = int(
+    //   float("%.8f" % float(Math.floor(100000000 / int(float(krakenprice)))))
+    // );
+    // server_fee = int(float(pricect["oracle_fee"])) * sats_per_dollar;
+    fee = 1000;
+
+    if (parseInt(party) == 1) {
+      contract.first_party_original = invoice;
+      console.log(invoice);
+
+      response = await decodePayReq(invoice);
+      // console.log("2.........", response);
+
+      expiry = response["timestamp"] + response["expiry"];
+
+      first_party_pmthash = response.payment_hash;
+      contract.first_party_pmthash = first_party_pmthash;
+
+      amount = response.num_satoshis + fee;
+      first_party_hodl_invoice = await getInvoice(
+        expiry,
+        first_party_pmthash,
+        amount
+      );
+      contract.first_party_hodl = first_party_hodl_invoice;
+
+      await contract.save();
+
+      return res.status(201).json(contract);
+    } else if (parseInt(party) == 2) {
+      contract.second_party_original = invoice;
+
+      response = await decodePayReq(invoice);
+
+      expiry = response.timestamp + response.expiry;
+
+      second_party_pmthash = response.payment_hash;
+      contract.second_party_pmthash = second_party_pmthash;
+
+      amount = response.num_satoshis + fee;
+      second_party_hodl_invoice = await getInvoice(
+        expiry,
+        second_party_pmthash,
+        amount
+      );
+      contract.second_party_hodl = second_party_hodl_invoice;
+
+      await contract.save();
+
+      return res.status(201).json(contract);
+    } else {
+      return res.status(400).json({ message: "party can only be 1 or 2" });
+    }
   } catch (err) {
     if (err.name === "CastError")
       return res.status(400).json({ message: "invalid contract id" });

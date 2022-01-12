@@ -1,15 +1,15 @@
 const { invoices, lightning, router } = require("./connect");
 
-const getInvoice = async ({ expiry, hash, amount }) => {
+const getInvoice = async (expiry, hash, amount) => {
   try {
     let request = {
       expiry: expiry,
       hash: hash,
       value: amount,
     };
-    const response = invoices.addHoldInvoice(request);
-
-    return response;
+    invoices.addHoldInvoice(request, function (err, response) {
+      console.log("addHoldInvoice: ", response);
+    });
   } catch (e) {
     console.log(e);
     return e;
@@ -21,8 +21,9 @@ const settleInvoice = async (preimage) => {
     let request = {
       preimage: preimage,
     };
-    const response = invoices.settleInvoice(request);
-    return response;
+    return invoices.settleInvoice(request, function (err, response) {
+      console.log("settleInvoice: ", response);
+    });
   } catch (e) {
     console.log(e);
     return e;
@@ -34,8 +35,9 @@ const cancelInvoice = async (hash) => {
     let request = {
       payment_hash: hash,
     };
-    const response = invoices.cancelInvoice(request);
-    return response;
+    return invoices.cancelInvoice(request, function (err, response) {
+      console.log("cancelInvoice: ", response);
+    });
   } catch (e) {
     console.log(e);
     return e;
@@ -47,8 +49,9 @@ const lookupInvoice = async (r_hash_str) => {
     let request = {
       r_hash_str: r_hash_str,
     };
-    const response = lightning.lookupInvoice(request);
-    return response;
+    return lightning.lookupInvoice(request, function (err, response) {
+      console.log("lookupInvoice: ", response);
+    });
   } catch (e) {
     console.log(e);
     return e;
@@ -62,8 +65,23 @@ const sendPayment = async (payment_request, timeout_seconds, fee_limit_sat) => {
       timeout_seconds: timeout_seconds,
       fee_limit_sat: fee_limit_sat,
     };
-    let call = router.sendPayment(request);
-    return call;
+    return router.sendPayment(request, function (err, response) {
+      console.log("sendPayment: ", response);
+    });
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
+};
+
+const decodePayReq = async (pay_req) => {
+  try {
+    let request = {
+      pay_req: pay_req,
+    };
+    return lightning.decodePayReq(request, function (err, response) {
+      console.log("decodePayReq: ", response);
+    });
   } catch (e) {
     console.log(e);
     return e;
@@ -76,4 +94,5 @@ module.exports = {
   cancelInvoice,
   lookupInvoice,
   sendPayment,
+  decodePayReq,
 };

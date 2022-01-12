@@ -7,7 +7,6 @@ import {
   CancelButtonContainer,
   SettleButtonContainer,
 } from "./Button/Container";
-import contracts from "../../reducers/contracts";
 
 const Wrapper = styled.div`
   align-items: center;
@@ -88,14 +87,3 @@ class Oracle extends React.Component {
 }
 
 export default Oracle;
-{
-  /* <PostDetailPost {...post} />
-        <PostDetailInfoBarContainer
-          id={post.id}
-          views={post.views}
-          upvotePercentage={post.upvotePercentage}
-          author={post.author}
-        />
-        {this.props.token && <CommentFormContainer id={post.id} />}
-        <PostDetailCommentSection comments={post.comments} /> */
-}

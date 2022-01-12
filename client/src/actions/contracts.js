@@ -5,6 +5,7 @@ import {
   getStatus,
   settleContract,
   cancelContract,
+  addInvoice,
 } from "../util/api";
 
 export const FETCH_CONTRACT_REQUEST = "FETCH_CONTRACT_REQUEST";
@@ -173,5 +174,29 @@ export const attemptCancelContract = (id, party) => async (
     dispatch(cancelContractSuccess(contract));
   } catch (error) {
     dispatch(cancelContractError(error));
+  }
+};
+
+export const ADD_INVOICE_REQUEST = "ADD_INVOICE_REQUEST";
+export const ADD_INVOICE_SUCCESS = "ADD_INVOICE_SUCCESS";
+export const ADD_INVOICE_ERROR = "ADD_INVOICE_ERROR";
+
+const addInvoiceRequest = { type: ADD_INVOICE_REQUEST };
+const addInvoiceSuccess = (contract) => ({
+  type: ADD_INVOICE_SUCCESS,
+  contract,
+});
+const addInvoiceError = (error) => ({ type: ADD_INVOICE_ERROR, error });
+
+export const attemptAddInvoice = (id, party, invoice) => async (
+  dispatch,
+  getState
+) => {
+  dispatch(addInvoiceRequest);
+  try {
+    const contract = await addInvoice(id, party, invoice);
+    dispatch(addInvoiceSuccess(contract));
+  } catch (error) {
+    dispatch(addInvoiceError(error));
   }
 };

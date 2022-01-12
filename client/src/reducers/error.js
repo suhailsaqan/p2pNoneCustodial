@@ -5,6 +5,9 @@ import {
   // FETCH_STATUS_ERROR,
   FETCH_STATUS_1_ERROR,
   FETCH_STATUS_2_ERROR,
+  SETTLE_CONTRACT_ERROR,
+  CANCEL_CONTRACT_ERROR,
+  ADD_INVOICE_ERROR,
 } from "../actions/contracts";
 import { HIDE_ERROR } from "../actions/error";
 
@@ -18,6 +21,9 @@ export default (state = initialState, action) => {
     // case FETCH_STATUS_ERROR:
     case FETCH_STATUS_1_ERROR:
     case FETCH_STATUS_2_ERROR:
+    case SETTLE_CONTRACT_ERROR:
+    case CANCEL_CONTRACT_ERROR:
+    case ADD_INVOICE_ERROR:
       return action.error;
 
     case HIDE_ERROR:
