@@ -7,6 +7,7 @@ const {
   sendPayment,
   decodePayReq,
 } = require("../lightning/invoices");
+const { invoices, lightning, router } = require("../lightning/connect");
 
 const STATUS_TYPES = {
   NO_INTERACTION: "No interaction yet",
@@ -56,8 +57,8 @@ exports.createContract = async (req, res, next) => {
       contract_name,
       description,
       settlement_date,
-      first_party_role,
-      second_party_role,
+      first_party_task,
+      second_party_task,
       first_party_amount,
       second_party_amount,
       oracle_fee,
@@ -66,8 +67,8 @@ exports.createContract = async (req, res, next) => {
       contract_name,
       description,
       settlement_date,
-      first_party_role,
-      second_party_role,
+      first_party_task,
+      second_party_task,
       first_party_amount,
       second_party_amount,
       oracle_fee,
@@ -282,46 +283,104 @@ exports.addInvoice = async (req, res, next) => {
       contract.first_party_original = invoice;
       console.log(invoice);
 
-      response = await decodePayReq(invoice);
-      // console.log("2.........", response);
+      //invoices.decodePayReq
+      let request = {
+        pay_req: invoice,
+      };
 
-      expiry = response["timestamp"] + response["expiry"];
+      lightning.decodePayReq(request, function (err, response) {
+        console.log(response);
+        // expiry = parseInt(response["timestamp"]) + parseInt(response["expiry"]);
+        expiry = 100;
 
-      first_party_pmthash = response.payment_hash;
-      contract.first_party_pmthash = first_party_pmthash;
+        first_party_pmthash = response.payment_hash;
+        first_party_pmthash = Buffer.from(first_party_pmthash, "hex");
+        console.log(first_party_pmthash);
+        contract.first_party_pmthash = first_party_pmthash;
 
-      amount = response.num_satoshis + fee;
-      first_party_hodl_invoice = await getInvoice(
-        expiry,
-        first_party_pmthash,
-        amount
-      );
-      contract.first_party_hodl = first_party_hodl_invoice;
+        amount = response.num_satoshis + fee;
 
-      await contract.save();
+        //lightning.getInvoice
+        let request = {
+          expiry: expiry,
+          hash: first_party_pmthash,
+          value: amount,
+        };
+        invoices.addHoldInvoice(request, function (err, res) {
+          console.log("err: ", err);
+          console.log("first_party_hodl_invoice", res.payment_request);
+          contract.first_party_hodl = res.payment_request;
 
-      return res.status(201).json(contract);
+          contract.save();
+        });
+
+        // first_party_hodl_invoice = await getInvoice(
+        //   expiry,
+        //   first_party_pmthash,
+        //   amount
+        // );
+      });
+      res.status(201).json(contract);
+
+      // response = await decodePayReq(invoice);
+
+      // expiry = response["timestamp"] + response["expiry"];
+
+      // first_party_pmthash = response.payment_hash;
+      // contract.first_party_pmthash = first_party_pmthash;
+
+      // amount = response.num_satoshis + fee;
+      // first_party_hodl_invoice = await getInvoice(
+      //   expiry,
+      //   first_party_pmthash,
+      //   amount
+      // );
+      // console.log("first_party_hodl_invoice", first_party_hodl_invoice);
+      // contract.first_party_hodl = first_party_hodl_invoice;
+
+      // await contract.save();
+
+      // return res.status(201).json(contract);
     } else if (parseInt(party) == 2) {
       contract.second_party_original = invoice;
+      console.log(invoice);
 
-      response = await decodePayReq(invoice);
+      //invoices.decodePayReq
+      let request = {
+        pay_req: invoice,
+      };
 
-      expiry = response.timestamp + response.expiry;
+      lightning.decodePayReq(request, function (err, response) {
+        expiry = response["timestamp"] + response["expiry"];
 
-      second_party_pmthash = response.payment_hash;
-      contract.second_party_pmthash = second_party_pmthash;
+        second_party_pmthash = response.payment_hash;
+        contract.second_party_pmthash = second_party_pmthash;
 
-      amount = response.num_satoshis + fee;
-      second_party_hodl_invoice = await getInvoice(
-        expiry,
-        second_party_pmthash,
-        amount
-      );
-      contract.second_party_hodl = second_party_hodl_invoice;
+        amount = response.num_satoshis + fee;
 
-      await contract.save();
+        //lightning.getInvoice
+        let request = {
+          expiry: expiry,
+          hash: second_party_pmthash,
+          value: amount,
+        };
+        invoices.addHoldInvoice(request, function (err, response) {
+          console.log("second_party_hodl_invoice", response);
+          contract.second_party_hodl = response;
 
-      return res.status(201).json(contract);
+          contract.save();
+
+          res.status(201).json(contract);
+        });
+
+        // second_party_hodl_invoice = await getInvoice(
+        //   expiry,
+        //   second_party_pmthash,
+        //   amount
+        // );
+      });
+
+      // response = await decodePayReq(invoice);
     } else {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }

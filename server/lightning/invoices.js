@@ -7,9 +7,12 @@ const getInvoice = async (expiry, hash, amount) => {
       hash: hash,
       value: amount,
     };
-    invoices.addHoldInvoice(request, function (err, response) {
-      console.log("addHoldInvoice: ", response);
+    return new Promise((resolve) => {
+      resolve(invoices.addHoldInvoice(request));
     });
+    // function (err, response) {
+    //   console.log("addHoldInvoice: ", response);
+    // }
   } catch (e) {
     console.log(e);
     return e;
@@ -79,6 +82,9 @@ const decodePayReq = async (pay_req) => {
     let request = {
       pay_req: pay_req,
     };
+    // return new Promise((resolve) => {
+    //   lightning.decodePayReq(request);
+    // });
     return lightning.decodePayReq(request, function (err, response) {
       console.log("decodePayReq: ", response);
     });

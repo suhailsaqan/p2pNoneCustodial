@@ -10,10 +10,6 @@ const ContractTemplates = [
     value: "trade",
   },
   {
-    label: "bet",
-    value: "bet",
-  },
-  {
     label: "loan",
     value: "loan",
   },
@@ -67,28 +63,28 @@ class CreateContractForm extends React.Component {
               defaultValue="2018-01-01"
             />
             <Field
-              label="first party's role"
-              name="first_party_role"
+              label="first party task"
+              name="first_party_task"
               type="text"
               component={renderField}
               defaultValue="Bitcoin buyer"
             />
             <Field
-              label="second party's role"
-              name="second_party_role"
+              label="second party's task"
+              name="second_party_task"
               type="text"
               component={renderField}
               defaultValue="Bitcoin seller"
             />
             <Field
-              label="how much will the first party send to the second party via bitcoin?"
+              label="how much bitcoin will the first party send to the second party"
               name="first_party_amount"
               type="text"
               component={renderField}
               defaultValue="0"
             />
             <Field
-              label="how much will the second party send to the first party via bitcoin?"
+              label="how much bitcoin will the second party send to the first party"
               name="second_party_amount"
               type="text"
               component={renderField}
@@ -127,15 +123,15 @@ class CreateContractForm extends React.Component {
               defaultValue="2018-01-01"
             />
             <Field
-              label="first party's role"
-              name="first_party_role"
+              label="first party's task"
+              name="first_party_task"
               type="text"
               component={renderField}
               defaultValue="Bitcoin Lender"
             />
             <Field
-              label="second party's role"
-              name="second_party_role"
+              label="second party's task"
+              name="second_party_task"
               type="text"
               component={renderField}
               defaultValue="Bitcoin Borrower"

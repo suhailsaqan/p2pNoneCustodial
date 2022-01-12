@@ -15,7 +15,7 @@ const mapDispatchToProps = { attemptCreateContract };
 const enhance = compose(
   reduxForm({
     form: "createContract",
-    initialValues: { type: "bet" },
+    initialValues: { type: "trade" },
   }),
   connect(mapStateToProps, mapDispatchToProps)
 );
