@@ -81,6 +81,8 @@ class Party extends React.Component {
       var hodl_invoice = contract.first_party_hodl;
     } else if (this.props.party == 2 && contract !== undefined) {
       var hodl_invoice = contract.second_party_hodl;
+    } else {
+      var hodl_invoice = "";
     }
 
     // var payment_not_received = false;

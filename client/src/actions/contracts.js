@@ -287,7 +287,7 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
       }
       if (
         getState().contracts.status_2 == STATUS_TYPES.WAITING_ON_OTHER_PARTY &&
-        getState().contracts.contract.first_party_hodl !== ""
+        getState().contracts.contract.first_party_hodl !== undefined
       ) {
         invoice_container = true; // show QR code
       }
@@ -308,13 +308,13 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
       }
       if (
         parseInt(getState().contracts.contract.second_party_amount) > 0 &&
-        getState().contracts.contract.first_party_hodl == ""
+        getState().contracts.contract.first_party_hodl == undefined
       ) {
         invoice_form = true;
       }
       if (
         parseInt(getState().contracts.contract.second_party_amount) > 0 &&
-        getState().contracts.contract.first_party_hodl !== ""
+        getState().contracts.contract.first_party_hodl !== undefined
       ) {
         instructions_invoiced = true;
       }
@@ -339,7 +339,7 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
       }
       if (
         getState().contracts.status_1 == STATUS_TYPES.WAITING_ON_OTHER_PARTY &&
-        getState().contracts.contract.second_party_hodl !== ""
+        getState().contracts.contract.second_party_hodl !== undefined
       ) {
         invoice_container = true; // show QR code
       }
@@ -360,14 +360,19 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
       }
       if (
         parseInt(getState().contracts.contract.first_party_amount) > 0 &&
-        getState().contracts.contract.second_party_hodl == ""
+        getState().contracts.contract.second_party_hodl == undefined
       ) {
         invoice_form = true;
       }
       if (
         parseInt(getState().contracts.contract.first_party_amount) > 0 &&
-        getState().contracts.contract.second_party_hodl !== ""
+        getState().contracts.contract.second_party_hodl !== undefined
       ) {
+        console.log(
+          "instructions_invoiced:",
+          parseInt(getState().contracts.contract.second_party_amount),
+          getState().contracts.contract.first_party_hodl
+        );
         instructions_invoiced = true;
       }
       if (invoice_form == false) {

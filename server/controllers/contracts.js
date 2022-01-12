@@ -291,7 +291,7 @@ exports.addInvoice = async (req, res, next) => {
       lightning.decodePayReq(request, function (err, response) {
         console.log(response);
         // expiry = parseInt(response["timestamp"]) + parseInt(response["expiry"]);
-        expiry = 100;
+        expiry = 10000000;
 
         first_party_pmthash = response.payment_hash;
         console.log(first_party_pmthash);
@@ -355,7 +355,7 @@ exports.addInvoice = async (req, res, next) => {
       lightning.decodePayReq(request, function (err, response) {
         console.log(response);
         // expiry = parseInt(response["timestamp"]) + parseInt(response["expiry"]);
-        expiry = 100;
+        expiry = 10000000;
 
         second_party_pmthash = response.payment_hash;
         console.log(second_party_pmthash);
