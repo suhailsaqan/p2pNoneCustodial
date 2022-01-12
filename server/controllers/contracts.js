@@ -294,9 +294,11 @@ exports.addInvoice = async (req, res, next) => {
         expiry = 100;
 
         first_party_pmthash = response.payment_hash;
-        first_party_pmthash = Buffer.from(first_party_pmthash, "hex");
         console.log(first_party_pmthash);
+
         contract.first_party_pmthash = first_party_pmthash;
+
+        first_party_pmthash = Buffer.from(first_party_pmthash, "hex");
 
         amount = response.num_satoshis + fee;
 
@@ -351,10 +353,16 @@ exports.addInvoice = async (req, res, next) => {
       };
 
       lightning.decodePayReq(request, function (err, response) {
-        expiry = response["timestamp"] + response["expiry"];
+        console.log(response);
+        // expiry = parseInt(response["timestamp"]) + parseInt(response["expiry"]);
+        expiry = 100;
 
         second_party_pmthash = response.payment_hash;
+        console.log(second_party_pmthash);
+
         contract.second_party_pmthash = second_party_pmthash;
+
+        second_party_pmthash = Buffer.from(second_party_pmthash, "hex");
 
         amount = response.num_satoshis + fee;
 
@@ -364,13 +372,12 @@ exports.addInvoice = async (req, res, next) => {
           hash: second_party_pmthash,
           value: amount,
         };
-        invoices.addHoldInvoice(request, function (err, response) {
-          console.log("second_party_hodl_invoice", response);
-          contract.second_party_hodl = response;
+        invoices.addHoldInvoice(request, function (err, res) {
+          console.log("err: ", err);
+          console.log("second_party_hodl_invoice", res.payment_request);
+          contract.second_party_hodl = res.payment_request;
 
           contract.save();
-
-          res.status(201).json(contract);
         });
 
         // second_party_hodl_invoice = await getInvoice(
@@ -379,8 +386,7 @@ exports.addInvoice = async (req, res, next) => {
         //   amount
         // );
       });
-
-      // response = await decodePayReq(invoice);
+      res.status(201).json(contract);
     } else {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }

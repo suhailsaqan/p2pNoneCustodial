@@ -8,6 +8,7 @@ import {
   SETTLE_CONTRACT_ERROR,
   CANCEL_CONTRACT_ERROR,
   ADD_INVOICE_ERROR,
+  SET_MESSAGES_ERROR,
 } from "../actions/contracts";
 import { HIDE_ERROR } from "../actions/error";
 
@@ -24,6 +25,7 @@ export default (state = initialState, action) => {
     case SETTLE_CONTRACT_ERROR:
     case CANCEL_CONTRACT_ERROR:
     case ADD_INVOICE_ERROR:
+    case SET_MESSAGES_ERROR:
       return action.error;
 
     case HIDE_ERROR:

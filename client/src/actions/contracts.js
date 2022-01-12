@@ -8,6 +8,14 @@ import {
   addInvoice,
 } from "../util/api";
 
+const STATUS_TYPES = {
+  NO_INTERACTION: "No interaction yet",
+  CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
+  CONTRACT_CANCELED: "Canceled",
+  CONTRACT_SETTLED: "Settled",
+  WAITING_ON_OTHER_PARTY: "Waiting on other party",
+};
+
 export const FETCH_CONTRACT_REQUEST = "FETCH_CONTRACT_REQUEST";
 export const FETCH_CONTRACT_SUCCESS = "FETCH_CONTRACT_SUCCESS";
 export const FETCH_CONTRACT_ERROR = "FETCH_CONTRACT_ERROR";
@@ -198,5 +206,191 @@ export const attemptAddInvoice = (id, party, invoice) => async (
     dispatch(addInvoiceSuccess(contract));
   } catch (error) {
     dispatch(addInvoiceError(error));
+  }
+};
+
+export const SET_MESSAGES_REQUEST = "SET_MESSAGES_REQUEST";
+export const SET_MESSAGES_SUCCESS = "SET_MESSAGES_SUCCESS";
+export const SET_MESSAGES_ERROR = "SET_MESSAGES_ERROR";
+
+const setMessagesRequest = { type: SET_MESSAGES_REQUEST };
+const setMessagesSuccess = (
+  payment_not_received,
+  payment_received,
+  instructions,
+  invoice_form,
+  completion_message,
+  instructions_awaiting_counterparty_invoice,
+  instructions_awaiting_counterparty_deposit,
+  invoice_container,
+  instructions_awaiting_settlement,
+  payment_sent,
+  payment_not_sent,
+  instructions_invoiced
+) => ({
+  type: SET_MESSAGES_SUCCESS,
+  payment_not_received,
+  payment_received,
+  instructions,
+  invoice_form,
+  completion_message,
+  instructions_awaiting_counterparty_invoice,
+  instructions_awaiting_counterparty_deposit,
+  invoice_container,
+  instructions_awaiting_settlement,
+  payment_sent,
+  payment_not_sent,
+  instructions_invoiced,
+});
+const setMessagesError = (error) => ({ type: SET_MESSAGES_ERROR, error });
+
+export const attemptSetMessages = (party) => async (dispatch, getState) => {
+  dispatch(setMessagesRequest);
+  try {
+    var payment_not_received = false;
+    var payment_received = false;
+    var instructions = false;
+    var invoice_form = false;
+    var completion_message = false;
+    var instructions_awaiting_counterparty_invoice = false;
+    var instructions_awaiting_counterparty_deposit = false;
+    var invoice_container = false;
+    var instructions_awaiting_settlement = false;
+    var payment_sent = false;
+    var payment_not_sent = false;
+    var instructions_invoiced = false;
+
+    // console.log(
+    //   "actions:",
+    //   getState(),
+    //   party,
+    //   getState().contracts.contract,
+    //   getState().contracts.status_1,
+    //   getState().contracts.status_2
+    // );
+
+    if (parseInt(party) == 1) {
+      if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_CANCELED) {
+        payment_not_received = true;
+        completion_message = true;
+      }
+      if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_SETTLED) {
+        payment_received = true;
+        completion_message = true;
+      }
+      if (getState().contracts.status_2 == STATUS_TYPES.NO_INTERACTION) {
+        if (parseInt(getState().contracts.first_party_amount) > 0) {
+          instructions_awaiting_counterparty_invoice = true;
+        } else {
+          instructions_awaiting_counterparty_deposit = true;
+        }
+      }
+      if (
+        getState().contracts.status_2 == STATUS_TYPES.WAITING_ON_OTHER_PARTY &&
+        getState().contracts.contract.first_party_hodl !== ""
+      ) {
+        invoice_container = true; // show QR code
+      }
+      if (
+        getState().contracts.status_2 ==
+        STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT
+      ) {
+        instructions_awaiting_settlement = true;
+        instructions = true;
+      }
+      if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_SETTLED) {
+        payment_sent = true;
+        completion_message = true;
+      }
+      if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_CANCELED) {
+        payment_not_sent = true;
+        completion_message = true;
+      }
+      if (
+        parseInt(getState().contracts.contract.second_party_amount) > 0 &&
+        getState().contracts.contract.first_party_hodl == ""
+      ) {
+        invoice_form = true;
+      }
+      if (
+        parseInt(getState().contracts.contract.second_party_amount) > 0 &&
+        getState().contracts.contract.first_party_hodl !== ""
+      ) {
+        instructions_invoiced = true;
+      }
+      if (invoice_form == false) {
+        instructions = true;
+      }
+    } else if (parseInt(party) == 2) {
+      if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_CANCELED) {
+        payment_not_received = true;
+        completion_message = true;
+      }
+      if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_SETTLED) {
+        payment_received = true;
+        completion_message = true;
+      }
+      if (getState().contracts.status_1 == STATUS_TYPES.NO_INTERACTION) {
+        if (parseInt(getState().contracts.second_party_amount) > 0) {
+          instructions_awaiting_counterparty_invoice = true;
+        } else {
+          instructions_awaiting_counterparty_deposit = true;
+        }
+      }
+      if (
+        getState().contracts.status_1 == STATUS_TYPES.WAITING_ON_OTHER_PARTY &&
+        getState().contracts.contract.second_party_hodl !== ""
+      ) {
+        invoice_container = true; // show QR code
+      }
+      if (
+        getState().contracts.status_1 ==
+        STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT
+      ) {
+        instructions_awaiting_settlement = true;
+        instructions = true;
+      }
+      if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_SETTLED) {
+        payment_sent = true;
+        completion_message = true;
+      }
+      if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_CANCELED) {
+        payment_not_sent = true;
+        completion_message = true;
+      }
+      if (
+        parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+        getState().contracts.contract.second_party_hodl == ""
+      ) {
+        invoice_form = true;
+      }
+      if (
+        parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+        getState().contracts.contract.second_party_hodl !== ""
+      ) {
+        instructions_invoiced = true;
+      }
+      if (invoice_form == false) {
+        instructions = true;
+      }
+    }
+    dispatch(
+      setMessagesSuccess(
+        payment_not_received,
+        payment_received,
+        instructions,
+        invoice_form,
+        completion_message,
+        instructions_awaiting_counterparty_invoice,
+        instructions_awaiting_counterparty_deposit,
+        invoice_container,
+        instructions_awaiting_settlement,
+        payment_sent,
+        payment_not_sent,
+        instructions_invoiced
+      )
+    );
+  } catch (error) {
+    dispatch(setMessagesError(error));
   }
 };

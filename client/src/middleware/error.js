@@ -17,6 +17,8 @@ import {
   CANCEL_CONTRACT_ERROR,
   ADD_INVOICE_SUCCESS,
   ADD_INVOICE_ERROR,
+  SET_MESSAGES_SUCCESS,
+  SET_MESSAGES_ERROR,
 } from "../actions/contracts";
 import { hideErrorClearTimeout, showErrorWithTimeout } from "../actions/error";
 
@@ -32,6 +34,7 @@ export default (store) => (next) => (action) => {
     case SETTLE_CONTRACT_SUCCESS:
     case CANCEL_CONTRACT_SUCCESS:
     case ADD_INVOICE_SUCCESS:
+    case SET_MESSAGES_SUCCESS:
       if (store.getState().error) store.dispatch(hideErrorClearTimeout());
       break;
 
@@ -44,6 +47,7 @@ export default (store) => (next) => (action) => {
     case SETTLE_CONTRACT_ERROR:
     case CANCEL_CONTRACT_ERROR:
     case ADD_INVOICE_ERROR:
+    case SET_MESSAGES_ERROR:
       store.dispatch(showErrorWithTimeout(action.error));
       break;
 

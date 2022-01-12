@@ -26,6 +26,9 @@ import {
   ADD_INVOICE_REQUEST,
   ADD_INVOICE_SUCCESS,
   ADD_INVOICE_ERROR,
+  SET_MESSAGES_REQUEST,
+  SET_MESSAGES_SUCCESS,
+  SET_MESSAGES_ERROR,
 } from "../actions/contracts";
 
 const initialState = { isFetching: false, items: [] };
@@ -93,6 +96,31 @@ export default (state = initialState, action) => {
     case ADD_INVOICE_SUCCESS:
       return { ...state, isFetching: false, contract: action.contract };
     case ADD_INVOICE_ERROR:
+      return { ...state, isFetching: false };
+
+    case SET_MESSAGES_REQUEST:
+      return { ...state, isFetching: true };
+    case SET_MESSAGES_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        payment_not_received: action.payment_not_received,
+        payment_received: action.payment_received,
+        instructions: action.instructions,
+        invoice_form: action.invoice_form,
+        completion_message: action.completion_message,
+        instructions_awaiting_counterparty_invoice:
+          action.instructions_awaiting_counterparty_invoice,
+        instructions_awaiting_counterparty_deposit:
+          action.instructions_awaiting_counterparty_deposit,
+        invoice_container: action.invoice_container,
+        instructions_awaiting_settlement:
+          action.instructions_awaiting_settlement,
+        payment_sent: action.payment_sent,
+        payment_not_sent: action.payment_not_sent,
+        instructions_invoiced: action.instructions_invoiced,
+      };
+    case SET_MESSAGES_ERROR:
       return { ...state, isFetching: false };
 
     default:
