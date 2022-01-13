@@ -79,8 +79,10 @@ class Party extends React.Component {
 
     if (this.props.party == 1 && contract !== undefined) {
       var hodl_invoice = contract.first_party_hodl;
+      console.log("*****", hodl_invoice);
     } else if (this.props.party == 2 && contract !== undefined) {
       var hodl_invoice = contract.second_party_hodl;
+      console.log("*****", hodl_invoice);
     } else {
       var hodl_invoice = "";
     }

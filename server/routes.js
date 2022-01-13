@@ -18,6 +18,8 @@ router.post("/cancel", contracts.cancelContract);
 
 router.post("/invoice", contracts.addInvoice);
 
+router.get("/t/:id/:party", contracts.t);
+
 // Test routers
 router.get("/test", (req, res) => {
   res.json({

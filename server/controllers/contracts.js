@@ -1,6 +1,6 @@
 const Contract = require("../models/contract");
 const {
-  getInvoice,
+  createHoldInvoice,
   settleHoldInvoice,
   cancelHoldInvoice,
   lookupInvoice,
@@ -91,14 +91,14 @@ exports.getStatus = async (req, res, next) => {
       status = STATUS_TYPES.NO_INTERACTION;
     }
     if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
+      console.log(contract.first_party_original);
       pmthash = contract.first_party_pmthash;
-      response = await lookupInvoice(pmthash);
-      pmtstatus = response.state;
-      if (pmtstatus == 3) {
+      details = await lookupInvoice(pmthash);
+      if (!details.is_canceled) {
         status = STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
-      } else if (pmtstatus == 2) {
+      } else if (details.is_canceled) {
         status = STATUS_TYPES.CONTRACT_CANCELED;
-      } else if (pmtstatus == 1) {
+      } else if (details.is_confirmed) {
         status = STATUS_TYPES.CONTRACT_SETTLED;
       } else {
         status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
@@ -118,13 +118,12 @@ exports.getStatus = async (req, res, next) => {
         status = STATUS_TYPES.NO_INTERACTION;
       }
       pmthash = contract.second_party_pmthash;
-      response = await lookupInvoice(pmthash);
-      pmtstatus = response.state;
-      if (pmtstatus == 3) {
+      details = await lookupInvoice(pmthash);
+      if (!details.is_canceled) {
         status = STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
-      } else if (pmtstatus == 2) {
+      } else if (details.is_canceled) {
         status = STATUS_TYPES.CONTRACT_CANCELED;
-      } else if (pmtstatus == 1) {
+      } else if (details.is_confirmed) {
         status = STATUS_TYPES.CONTRACT_SETTLED;
       } else {
         status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
@@ -133,6 +132,39 @@ exports.getStatus = async (req, res, next) => {
     return res.status(201).json(status);
   } catch (err) {
     next(err);
+  }
+};
+
+exports.t = async (req, res, next) => {
+  try {
+    // TODO: check the status of the contract to be able to settle it
+    const { id, party } = req.params;
+
+    const contract = await Contract.findById(id);
+    if (contract == null) {
+      return res.status(404).json({ message: "contract not found" });
+    }
+
+    if (parseInt(party) == 1) {
+      pmthash = contract.first_party_pmthash;
+      invoiceDetails = await lookupInvoice(pmthash);
+      console.log(invoiceDetails);
+
+      if (!invoiceDetails.is_confirmed) {
+        console.log("confirmed");
+        original_invoice = contract.first_party_original;
+        paid = await sendPayment(
+          "lnbcrt500u1psaluuxpp5xtmevpgk65w7jccqdydn8ttw04q4n3cet9aj8wt7syzpj9pdfnpqdqqcqzpgsp5wl6h6zva0795sly9r8pk22e7z03jpx6y879fvvpshkzaq62gw68q9qyyssqgjj3avzafzhk5u5r9u43fssctruqt6gjukytz70xt4xdukaq2u93auqxayrcl8esl2xhwfsnxf80xhep9fkknqzqkx8qzzzhz3jgu9qpd7u55c",
+          1000,
+          15
+        );
+        console.log("paid:", paid);
+      }
+    }
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
   }
 };
 
@@ -149,58 +181,38 @@ exports.settleContract = async (req, res, next) => {
     if (parseInt(party) == 1) {
       pmthash = contract.first_party_pmthash;
       invoiceDetails = await lookupInvoice(pmthash);
+      console.log(invoiceDetails);
 
-      if (invoiceDetails.is_confirmed) {
+      if (!invoiceDetails.is_canceled) {
         original_invoice = contract.first_party_original;
-        paid = sendPayment(original_invoice, 1000, 15);
+        paid = await sendPayment(original_invoice, 1000, 15);
+        console.log(paid);
 
         if (paid.is_confirmed) {
-          pmtstatus = response[2].state;
-          if (parseInt(pmtstatus) == 1) {
-            payment_preimage_bytes = response[2].preimage;
+          payment_preimage = paid.secret;
 
-            await settleHoldInvoice(
-              payment_preimage_bytes,
-              function (err, response) {
-                console.log(response);
-                return res.status(201).json(contract);
-              }
-            );
-          }
+          await settleHoldInvoice(payment_preimage);
+
+          return res.status(201).json(contract);
         }
+        res.status(400).json({ error: "paid.is_confirmed" });
+      } else {
+        res.status(400).json({ error: "!invoiceDetails.is_canceled" });
       }
     } else if (parseInt(party) == 2) {
       pmthash = contract.second_party_pmthash;
-      response = await lookupInvoice(pmthash);
-      pmtstatus = response.state;
+      invoiceDetails = await lookupInvoice(pmthash);
 
-      if (pmtstatus == 3) {
+      if (!invoiceDetails.is_canceled) {
         original_invoice = contract.second_party_original;
-        call = await sendPayment(original_invoice, 1000, 15);
-        response = [];
-        call.on("data", function (data) {
-          // A response was received from the server.
-          console.log(data);
-          response.push(data);
-        });
-        call.on("end", function () {
-          // The server has closed the stream.
-          console.log("end");
-          cont = true;
-        });
-        if (cont) {
-          pmtstatus = response[2].state;
-          if (parseInt(pmtstatus) == 1) {
-            payment_preimage_bytes = fullresponse[2].preimage;
+        paid = await sendPayment(original_invoice, 1000, 15);
 
-            await settleHoldInvoice(
-              payment_preimage_bytes,
-              function (err, response) {
-                console.log(response);
-                return res.status(201).json(contract);
-              }
-            );
-          }
+        if (paid.is_confirmed) {
+          payment_preimage = paid.secret;
+
+          await settleHoldInvoice(payment_preimage);
+
+          return res.status(201).json(contract);
         }
       }
     } else {
@@ -230,10 +242,8 @@ exports.cancelContract = async (req, res, next) => {
     } else {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }
-    await cancelHoldInvoice(pmthash, function (err, response) {
-      console.log(response);
-      return res.status(201).json(contract);
-    });
+    await cancelHoldInvoice(pmthash);
+    return res.status(201).json(contract);
   } catch (err) {
     if (err.name === "CastError")
       return res.status(400).json({ message: "invalid contract id" });
@@ -263,113 +273,55 @@ exports.addInvoice = async (req, res, next) => {
     fee = 1000;
 
     if (parseInt(party) == 1) {
-      contract.first_party_original = invoice;
-      console.log(invoice);
+      if (contract.first_party_hodl == undefined) {
+        contract.first_party_original = invoice;
 
-      //invoices.decodePayReq
-      let request = {
-        pay_req: invoice,
-      };
+        const details = await decodePayReq(invoice);
 
-      lightning.decodePayReq(request, function (err, response) {
-        console.log(response);
-        // expiry = parseInt(response["timestamp"]) + parseInt(response["expiry"]);
         expiry = 10000000;
 
-        first_party_pmthash = response.payment_hash;
-        console.log(first_party_pmthash);
-
+        first_party_pmthash = details.id;
         contract.first_party_pmthash = first_party_pmthash;
 
-        first_party_pmthash = Buffer.from(first_party_pmthash, "hex");
+        amount = details.tokens + fee;
 
-        amount = response.num_satoshis + fee;
+        first_party_hodl = await createHoldInvoice(
+          expiry,
+          first_party_pmthash,
+          amount
+        );
 
-        //lightning.getInvoice
-        let request = {
-          expiry: expiry,
-          hash: first_party_pmthash,
-          value: amount,
-        };
-        invoices.addHoldInvoice(request, function (err, res) {
-          console.log("err: ", err);
-          console.log("first_party_hodl_invoice", res.payment_request);
-          contract.first_party_hodl = res.payment_request;
+        contract.first_party_hodl = first_party_hodl;
 
-          contract.save();
-        });
+        contract.save();
 
-        // first_party_hodl_invoice = await getInvoice(
-        //   expiry,
-        //   first_party_pmthash,
-        //   amount
-        // );
-      });
-      res.status(201).json(contract);
-
-      // response = await decodePayReq(invoice);
-
-      // expiry = response["timestamp"] + response["expiry"];
-
-      // first_party_pmthash = response.payment_hash;
-      // contract.first_party_pmthash = first_party_pmthash;
-
-      // amount = response.num_satoshis + fee;
-      // first_party_hodl_invoice = await getInvoice(
-      //   expiry,
-      //   first_party_pmthash,
-      //   amount
-      // );
-      // console.log("first_party_hodl_invoice", first_party_hodl_invoice);
-      // contract.first_party_hodl = first_party_hodl_invoice;
-
-      // await contract.save();
-
-      // return res.status(201).json(contract);
+        res.status(201).json(contract);
+      }
     } else if (parseInt(party) == 2) {
-      contract.second_party_original = invoice;
-      console.log(invoice);
+      if (contract.second_party_hodl == undefined) {
+        contract.second_party_original = invoice;
 
-      //invoices.decodePayReq
-      let request = {
-        pay_req: invoice,
-      };
+        const details = await decodePayReq(invoice);
 
-      lightning.decodePayReq(request, function (err, response) {
-        console.log(response);
-        // expiry = parseInt(response["timestamp"]) + parseInt(response["expiry"]);
         expiry = 10000000;
 
-        second_party_pmthash = response.payment_hash;
-        console.log(second_party_pmthash);
-
+        second_party_pmthash = details.id;
         contract.second_party_pmthash = second_party_pmthash;
 
-        second_party_pmthash = Buffer.from(second_party_pmthash, "hex");
+        amount = details.tokens + fee;
 
-        amount = response.num_satoshis + fee;
+        second_party_hodl = await createHoldInvoice(
+          expiry,
+          second_party_pmthash,
+          amount
+        );
 
-        //lightning.getInvoice
-        let request = {
-          expiry: expiry,
-          hash: second_party_pmthash,
-          value: amount,
-        };
-        invoices.addHoldInvoice(request, function (err, res) {
-          console.log("err: ", err);
-          console.log("second_party_hodl_invoice", res.payment_request);
-          contract.second_party_hodl = res.payment_request;
+        contract.second_party_hodl = second_party_hodl;
 
-          contract.save();
-        });
+        contract.save();
 
-        // second_party_hodl_invoice = await getInvoice(
-        //   expiry,
-        //   second_party_pmthash,
-        //   amount
-        // );
-      });
-      res.status(201).json(contract);
+        res.status(201).json(contract);
+      }
     } else {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }

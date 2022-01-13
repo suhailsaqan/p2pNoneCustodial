@@ -1,13 +1,18 @@
 // const { invoices, lightning, router } = require("./connect");
-const { lnd } = require("./connect");
+const lnd = require("./connect");
+// console.log(lnd);
 const {
   getInvoice,
   cancelHodlInvoice,
   decodePaymentRequest,
   settleHodlInvoice,
   createHodlInvoice,
-} = require("ln-service");
+  pay,
+} = require("lightning");
 const asyncRetry = require("async/retry");
+
+const interval = 10;
+const times = 1000;
 
 /*@returns via cbk or Promise
 {
@@ -23,11 +28,10 @@ const asyncRetry = require("async/retry");
 
 // needs hex, not buffer bytes
 // needs the date it will expire
-const getInvoice = async (expiresAt, hash, amount) => {
+const createHoldInvoice = async (expiresAt, hash, amount) => {
   try {
     const { request } = await createHodlInvoice({
-      lnd,
-      description,
+      lnd: lnd,
       id: hash,
       tokens: amount,
       expires_at: expiresAt,
@@ -41,10 +45,9 @@ const getInvoice = async (expiresAt, hash, amount) => {
 
 // DOES NOT RETURN ANYTHING
 // needs preimage
-const settleHoldInvoice = async ({ secret }) => {
+const settleHoldInvoice = async (secret) => {
   try {
-    await settleHodlInvoice({ lnd, secret });
-    return ret;
+    await settleHodlInvoice({ lnd: lnd, secret: secret });
   } catch (e) {
     console.log(e);
     return e;
@@ -52,9 +55,9 @@ const settleHoldInvoice = async ({ secret }) => {
 };
 
 // DOES NOT RETURN ANYTHING
-const cancelHoldInvoice = async ({ hash }) => {
+const cancelHoldInvoice = async (hash) => {
   try {
-    await cancelHodlInvoice({ lnd, id: hash });
+    await cancelHodlInvoice({ lnd: lnd, id: hash });
   } catch (e) {
     console.log(e);
     return e;
@@ -110,7 +113,7 @@ const cancelHoldInvoice = async ({ hash }) => {
 // DONE
 const lookupInvoice = async (id) => {
   try {
-    const invoiceDetails = await getInvoice({ lnd, id });
+    const invoiceDetails = await getInvoice({ lnd: lnd, id: id });
     return invoiceDetails;
   } catch (e) {
     console.log(e);
@@ -142,13 +145,11 @@ const lookupInvoice = async (id) => {
 // not sure if timeout needs to be in seconds, docs doesn't explain well
 const sendPayment = async (payment_request, timeout_seconds, fee_limit_sat) => {
   try {
-    const paid = await asyncRetry({ interval, times }, async () => {
-      return await await pay({
-        lnd,
-        request: payment_request,
-        max_timeout_height: timeout_seconds,
-        max_fee: fee_limit_sat,
-      });
+    const paid = await pay({
+      lnd: lnd,
+      request: payment_request,
+      max_timeout_height: timeout_seconds,
+      max_fee: fee_limit_sat,
     });
     return paid;
   } catch (e) {
@@ -189,7 +190,7 @@ const sendPayment = async (payment_request, timeout_seconds, fee_limit_sat) => {
 
 const decodePayReq = async (pay_req) => {
   try {
-    const details = await decodePaymentRequest({ lnd, pay_req });
+    const details = await decodePaymentRequest({ lnd: lnd, request: pay_req });
     return details;
   } catch (e) {
     console.log(e);
@@ -198,7 +199,7 @@ const decodePayReq = async (pay_req) => {
 };
 
 module.exports = {
-  getInvoice,
+  createHoldInvoice,
   settleHoldInvoice,
   cancelHoldInvoice,
   lookupInvoice,
