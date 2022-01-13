@@ -1,8 +1,8 @@
 const Contract = require("../models/contract");
 const {
   getInvoice,
-  settleInvoice,
-  cancelInvoice,
+  settleHoldInvoice,
+  cancelHoldInvoice,
   lookupInvoice,
   sendPayment,
   decodePayReq,
@@ -16,12 +16,6 @@ const STATUS_TYPES = {
   CONTRACT_SETTLED: "Settled",
   WAITING_ON_OTHER_PARTY: "Waiting on other party",
 };
-
-function toHexString(byteArray) {
-  return Array.from(byteArray, function (byte) {
-    return ("0" + (byte & 0xff).toString(16)).slice(-2);
-  }).join("");
-}
 
 exports.getContract = async (req, res, next) => {
   try {
@@ -154,29 +148,18 @@ exports.settleContract = async (req, res, next) => {
 
     if (parseInt(party) == 1) {
       pmthash = contract.first_party_pmthash;
-      response = await lookupInvoice(pmthash);
-      pmtstatus = response.state;
+      invoiceDetails = await lookupInvoice(pmthash);
 
-      if (pmtstatus == 3) {
+      if (invoiceDetails.is_confirmed) {
         original_invoice = contract.first_party_original;
-        call = sendPayment(original_invoice, 1000, 15);
-        response = [];
-        call.on("data", function (data) {
-          // A response was received from the server.
-          console.log(data);
-          response.push(data);
-        });
-        call.on("end", function () {
-          // The server has closed the stream.
-          console.log("end");
-          cont = true;
-        });
-        if (cont) {
+        paid = sendPayment(original_invoice, 1000, 15);
+
+        if (paid.is_confirmed) {
           pmtstatus = response[2].state;
           if (parseInt(pmtstatus) == 1) {
-            payment_preimage_bytes = fullresponse[2].preimage;
+            payment_preimage_bytes = response[2].preimage;
 
-            await settleInvoice(
+            await settleHoldInvoice(
               payment_preimage_bytes,
               function (err, response) {
                 console.log(response);
@@ -210,7 +193,7 @@ exports.settleContract = async (req, res, next) => {
           if (parseInt(pmtstatus) == 1) {
             payment_preimage_bytes = fullresponse[2].preimage;
 
-            await settleInvoice(
+            await settleHoldInvoice(
               payment_preimage_bytes,
               function (err, response) {
                 console.log(response);
@@ -247,7 +230,7 @@ exports.cancelContract = async (req, res, next) => {
     } else {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }
-    await cancelInvoice(pmthash, function (err, response) {
+    await cancelHoldInvoice(pmthash, function (err, response) {
       console.log(response);
       return res.status(201).json(contract);
     });

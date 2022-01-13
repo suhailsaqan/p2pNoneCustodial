@@ -1,93 +1,196 @@
-const { invoices, lightning, router } = require("./connect");
+// const { invoices, lightning, router } = require("./connect");
+const { lnd } = require("./connect");
+const {
+  getInvoice,
+  cancelHodlInvoice,
+  decodePaymentRequest,
+  settleHodlInvoice,
+  createHodlInvoice,
+} = require("ln-service");
+const asyncRetry = require("async/retry");
 
-const getInvoice = async (expiry, hash, amount) => {
+/*@returns via cbk or Promise
+{
+  [chain_address]: <Backup Address String>
+  created_at: <ISO 8601 Date String>
+  description: <Description String>
+  id: <Payment Hash Hex String>
+  mtokens: <Millitokens String>
+  request: <BOLT 11 Encoded Payment Request String>
+  [secret]: <Hex Encoded Payment Secret String>
+  tokens: <Tokens Number>
+}*/
+
+// needs hex, not buffer bytes
+// needs the date it will expire
+const getInvoice = async (expiresAt, hash, amount) => {
   try {
-    let request = {
-      expiry: expiry,
-      hash: hash,
-      value: amount,
-    };
-    return new Promise((resolve) => {
-      resolve(invoices.addHoldInvoice(request));
+    const { request } = await createHodlInvoice({
+      lnd,
+      description,
+      id: hash,
+      tokens: amount,
+      expires_at: expiresAt,
     });
-    // function (err, response) {
-    //   console.log("addHoldInvoice: ", response);
-    // }
+    return request;
   } catch (e) {
     console.log(e);
     return e;
   }
 };
 
-const settleInvoice = async (preimage) => {
+// DOES NOT RETURN ANYTHING
+// needs preimage
+const settleHoldInvoice = async ({ secret }) => {
   try {
-    let request = {
-      preimage: preimage,
-    };
-    return invoices.settleInvoice(request, function (err, response) {
-      console.log("settleInvoice: ", response);
-    });
+    await settleHodlInvoice({ lnd, secret });
+    return ret;
   } catch (e) {
     console.log(e);
     return e;
   }
 };
 
-const cancelInvoice = async (hash) => {
+// DOES NOT RETURN ANYTHING
+const cancelHoldInvoice = async ({ hash }) => {
   try {
-    let request = {
-      payment_hash: hash,
-    };
-    return invoices.cancelInvoice(request, function (err, response) {
-      console.log("cancelInvoice: ", response);
-    });
+    await cancelHodlInvoice({ lnd, id: hash });
   } catch (e) {
     console.log(e);
     return e;
   }
 };
 
-const lookupInvoice = async (r_hash_str) => {
+/*@returns via cbk or Promise
+{
+  [chain_address]: <Fallback Chain Address String>
+  cltv_delta: <CLTV Delta Number>
+  [confirmed_at]: <Settled at ISO 8601 Date String>
+  created_at: <ISO 8601 Date String>
+  description: <Description String>
+  [description_hash]: <Description Hash Hex String>
+  expires_at: <ISO 8601 Date String>
+  features: [{
+    bit: <BOLT 09 Feature Bit Number>
+    is_known: <Feature is Known Bool>
+    is_required: <Feature Support is Required To Pay Bool>
+    type: <Feature Type String>
+  }]
+  id: <Payment Hash String>
+  [is_canceled]: <Invoice is Canceled Bool>
+  is_confirmed: <Invoice is Confirmed Bool>
+  [is_held]: <HTLC is Held Bool>
+  is_private: <Invoice is Private Bool>
+  [is_push]: <Invoice is Push Payment Bool>
+  mtokens: <Millitokens String>
+  [payment]: <Payment Identifying Secret Hex String>
+  payments: [{
+    [confirmed_at]: <Payment Settled At ISO 8601 Date String>
+    created_at: <Payment Held Since ISO 860 Date String>
+    created_height: <Payment Held Since Block Height Number>
+    in_channel: <Incoming Payment Through Channel Id String>
+    is_canceled: <Payment is Canceled Bool>
+    is_confirmed: <Payment is Confirmed Bool>
+    is_held: <Payment is Held Bool>
+    messages: [{
+      type: <Message Type Number String>
+      value: <Raw Value Hex String>
+    }]
+    mtokens: <Incoming Payment Millitokens String>
+    [pending_index]: <Pending Payment Channel HTLC Index Number>
+    timeout: <HTLC CLTV Timeout Height Number>
+    tokens: <Payment Tokens Number>
+  }]
+  received: <Received Tokens Number>
+  received_mtokens: <Received Millitokens String>
+  [request]: <Bolt 11 Invoice String>
+  secret: <Secret Preimage Hex String>
+  tokens: <Tokens Number>
+}*/
+// DONE
+const lookupInvoice = async (id) => {
   try {
-    let request = {
-      r_hash_str: r_hash_str,
-    };
-    return lightning.lookupInvoice(request, function (err, response) {
-      console.log("lookupInvoice: ", response);
-    });
+    const invoiceDetails = await getInvoice({ lnd, id });
+    return invoiceDetails;
   } catch (e) {
     console.log(e);
     return e;
   }
 };
 
+/*@returns via cbk or Promise
+{
+  confirmed_at: <Payment Confirmed At ISO 8601 Date String>
+  fee: <Fee Paid Tokens Number>
+  fee_mtokens: <Fee Paid Millitokens String>
+  hops: [{
+    channel: <Standard Format Channel Id String>
+    channel_capacity: <Hop Channel Capacity Tokens Number>
+    fee_mtokens: <Hop Forward Fee Millitokens String>
+    forward_mtokens: <Hop Forwarded Millitokens String>
+    timeout: <Hop CLTV Expiry Block Height Number>
+  }]
+  id: <Payment Hash Hex String>
+  is_confirmed: <Is Confirmed Bool>
+  is_outgoing: <Is Outoing Bool>
+  mtokens: <Total Millitokens Sent String>
+  safe_fee: <Payment Forwarding Fee Rounded Up Tokens Number>
+  safe_tokens: <Payment Tokens Rounded Up Number>
+  secret: <Payment Secret Preimage Hex String>
+  tokens: <Total Tokens Sent Number>
+}*/
+// not sure if timeout needs to be in seconds, docs doesn't explain well
 const sendPayment = async (payment_request, timeout_seconds, fee_limit_sat) => {
   try {
-    let request = {
-      payment_request: payment_request,
-      timeout_seconds: timeout_seconds,
-      fee_limit_sat: fee_limit_sat,
-    };
-    return router.sendPayment(request, function (err, response) {
-      console.log("sendPayment: ", response);
+    const paid = await asyncRetry({ interval, times }, async () => {
+      return await await pay({
+        lnd,
+        request: payment_request,
+        max_timeout_height: timeout_seconds,
+        max_fee: fee_limit_sat,
+      });
     });
+    return paid;
   } catch (e) {
     console.log(e);
     return e;
   }
 };
+
+/*@returns via cbk or Promise
+{
+  chain_address: <Fallback Chain Address String>
+  [cltv_delta]: <Final CLTV Delta Number>
+  created_at: <Payment Request Created At ISO 8601 Date String>
+  description: <Payment Description String>
+  description_hash: <Payment Longer Description Hash Hex String>
+  destination: <Public Key Hex String>
+  expires_at: <ISO 8601 Date String>
+  features: [{
+    bit: <BOLT 09 Feature Bit Number>
+    is_known: <Feature is Known Bool>
+    is_required: <Feature Support is Required To Pay Bool>
+    type: <Feature Type String>
+  }]
+  id: <Payment Hash Hex String>
+  is_expired: <Invoice is Expired Bool>
+  mtokens: <Requested Millitokens String>
+  [payment]: <Payment Identifier Hex Encoded String>
+  routes: [[{
+    [base_fee_mtokens]: <Base Routing Fee In Millitokens String>
+    [channel]: <Standard Format Channel Id String>
+    [cltv_delta]: <CLTV Blocks Delta Number>
+    [fee_rate]: <Fee Rate In Millitokens Per Million Number>
+    public_key: <Forward Edge Public Key Hex String>
+  }]]
+  safe_tokens: <Requested Tokens Rounded Up Number>
+  tokens: <Requested Tokens Rounded Down Number>
+}*/
 
 const decodePayReq = async (pay_req) => {
   try {
-    let request = {
-      pay_req: pay_req,
-    };
-    // return new Promise((resolve) => {
-    //   lightning.decodePayReq(request);
-    // });
-    return lightning.decodePayReq(request, function (err, response) {
-      console.log("decodePayReq: ", response);
-    });
+    const details = await decodePaymentRequest({ lnd, pay_req });
+    return details;
   } catch (e) {
     console.log(e);
     return e;
@@ -96,8 +199,8 @@ const decodePayReq = async (pay_req) => {
 
 module.exports = {
   getInvoice,
-  settleInvoice,
-  cancelInvoice,
+  settleHoldInvoice,
+  cancelHoldInvoice,
   lookupInvoice,
   sendPayment,
   decodePayReq,
