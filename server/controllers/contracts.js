@@ -94,7 +94,8 @@ exports.getStatus = async (req, res, next) => {
       console.log(contract.first_party_original);
       pmthash = contract.first_party_pmthash;
       details = await lookupInvoice(pmthash);
-      if (!details.is_canceled) {
+      console.log(details);
+      if (details.is_held) {
         status = STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
       } else if (details.is_canceled) {
         status = STATUS_TYPES.CONTRACT_CANCELED;
@@ -119,7 +120,8 @@ exports.getStatus = async (req, res, next) => {
       }
       pmthash = contract.second_party_pmthash;
       details = await lookupInvoice(pmthash);
-      if (!details.is_canceled) {
+      console.log(details);
+      if (details.is_held) {
         status = STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
       } else if (details.is_canceled) {
         status = STATUS_TYPES.CONTRACT_CANCELED;

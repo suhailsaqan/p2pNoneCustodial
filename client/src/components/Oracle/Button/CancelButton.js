@@ -17,10 +17,14 @@ const CancelButtonStyle = styled(Button)`
   }
 `;
 
+// allow: false,
+// block: true,
+
 let disable = (status) => {
-  if (status === STATUS_TYPES.WAITING_ON_OTHER_PARTY) {
-    return true;
-  } else if (status === STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT) {
+  if (status == STATUS_TYPES.WAITING_ON_OTHER_PARTY) {
+    console.log(status, STATUS_TYPES.WAITING_ON_OTHER_PARTY);
+    return false;
+  } else if (status == STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT) {
     return false;
   } else {
     return true;

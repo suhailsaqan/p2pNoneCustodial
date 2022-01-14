@@ -5,7 +5,25 @@ import Empty from "../shared/Empty";
 import { Link } from "react-router-dom";
 import InvoiceFormContainer from "./InvoiceForm/Container";
 import contracts from "../../reducers/contracts";
+import { smallFont } from "../shared/helpers";
 var QRCode = require("qrcode.react");
+
+const Par = styled.div`
+  ${smallFont};
+
+  // border: 1px solid ${(props) => props.theme.border};
+  border-radius: 2px;
+  padding: 14px 0;
+  // background-color: ${(props) => props.theme.foreground};
+  text-align: center;
+  color: ${(props) => props.theme.normalText};
+
+  @media (max-width: 768px) {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+`;
 
 const Wrapper = styled.div`
   align-items: center;
@@ -14,14 +32,6 @@ const Wrapper = styled.div`
   justify-content: center;
   flex-direction: column;
 `;
-
-const STATUS_TYPES = {
-  NO_INTERACTION: "No interaction yet",
-  CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
-  CONTRACT_CANCELED: "Canceled",
-  CONTRACT_SETTLED: "Settled",
-  WAITING_ON_OTHER_PARTY: "Waiting on other party",
-};
 
 class Party extends React.Component {
   componentDidMount() {
@@ -77,38 +87,28 @@ class Party extends React.Component {
     if (this.props.isFetching) return <LoadingIndicatorBox />;
     if (!contract) return <Empty />;
 
-    if (this.props.party == 1 && contract !== undefined) {
-      var hodl_invoice = contract.first_party_hodl;
-      console.log("*****", hodl_invoice);
-    } else if (this.props.party == 2 && contract !== undefined) {
+    if (this.props.party == 1 && contract.second_party_hodl !== undefined) {
       var hodl_invoice = contract.second_party_hodl;
+      console.log("*****", hodl_invoice);
+    } else if (
+      this.props.party == 2 &&
+      contract.first_party_hodl !== undefined
+    ) {
+      var hodl_invoice = contract.first_party_hodl;
       console.log("*****", hodl_invoice);
     } else {
       var hodl_invoice = "";
     }
 
-    // var payment_not_received = false;
-    // var payment_received = false;
-    // var instructions = false;
-    // var invoice_form = false;
-    // var completion_message = false;
-    // var instructions_awaiting_counterparty_invoice = false;
-    // var instructions_awaiting_counterparty_deposit = false;
-    // var invoice_container = false;
-    // var instructions_awaiting_settlement = false;
-    // var payment_sent = false;
-    // var payment_not_sent = false;
-    // var instructions_invoiced = false;
-
     return (
       <Wrapper>
-        <p>{contract.description}</p>
+        <Par>{contract.description}</Par>
 
-        {this.props.party == 1 && <p>First Party</p>}
-        {this.props.party == 2 && <p>Second Party</p>}
+        {this.props.party == 1 && <Par>First Party</Par>}
+        {this.props.party == 2 && <Par>Second Party</Par>}
 
-        {this.props.party == 1 && <p>Current Status: {status_1}</p>}
-        {this.props.party == 2 && <p>Current Status: {status_2}</p>}
+        {this.props.party == 1 && <Par>Current Status: {status_1}</Par>}
+        {this.props.party == 2 && <Par>Current Status: {status_2}</Par>}
 
         {invoice_form && (
           <InvoiceFormContainer id={contract._id} party={this.props.party} />
@@ -116,46 +116,48 @@ class Party extends React.Component {
         {instructions && (
           <div>
             {instructions_invoiced && (
-              <p>You have already submitted your invoice.</p>
+              <Par>You have already submitted your invoice.</Par>
             )}
             {instructions_awaiting_counterparty_invoice && (
-              <p>
+              <Par>
                 Please wait while your counterparty creates an invoice. Check
                 back later.
-              </p>
+              </Par>
             )}{" "}
             {instructions_awaiting_counterparty_deposit && (
-              <p>
+              <Par>
                 Please wait while your counterparty pays your invoice. Check
                 back later.{" "}
-              </p>
+              </Par>
             )}
             {instructions_awaiting_settlement && (
-              <p>
+              <Par>
                 Please await your settlement date (visible in the contract
                 details below) and contact your oracle for more info.
-              </p>
+              </Par>
             )}
           </div>
         )}
         {invoice_container && (
           <div>
-            <p>Deposit funds to this smart contract:</p>
+            <Par>Deposit funds to this smart contract:</Par>
             <QRCode value={hodl_invoice} />
             <p>{hodl_invoice}</p>
           </div>
         )}
         {payment_received && (
-          <p>You received a payment from your counterparty</p>
+          <Par>You received a payment from your counterparty</Par>
         )}
-        {payment_sent && <p>Your payment to your counterparty went through</p>}
+        {payment_sent && (
+          <Par>Your payment to your counterparty went through</Par>
+        )}
         {payment_not_received && (
-          <p>The oracle canceled a payment from your counterparty to you</p>
+          <Par>The oracle canceled a payment from your counterparty to you</Par>
         )}
         {payment_not_sent && (
-          <p>The oracle canceled a payment from you to your counterparty</p>
+          <Par>The oracle canceled a payment from you to your counterparty</Par>
         )}
-        {completion_message && <p>This contract is complete</p>}
+        {completion_message && <Par>This contract is complete</Par>}
       </Wrapper>
     );
   }

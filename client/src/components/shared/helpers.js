@@ -1,4 +1,4 @@
-import { css, keyframes } from 'styled-components';
+import { css, keyframes } from "styled-components";
 
 export const smallFont = css`
   font-size: 12px;
@@ -22,10 +22,10 @@ export const fade = css`
 `;
 
 export const transition = (...props) => {
-  let str = 'transition: ';
+  let str = "transition: ";
   props.forEach((item, index) => {
     str = str.concat(
-      `${item} 0.1s ease${index === props.length - 1 ? ';' : ', '}`
+      `${item} 0.1s ease${index === props.length - 1 ? ";" : ", "}`
     );
   });
   return str;
@@ -42,16 +42,16 @@ export const headerItem = css`
   }
 `;
 
-export const link = props => css`
-  ${transition('color')};
+export const link = (props) => css`
+  ${transition("color")};
 
   text-underline-position: under;
   text-decoration: none;
-  color: ${props => props.theme.normalText};
+  color: ${(props) => props.theme.normalText};
 
   :hover {
-    ${props.underline && 'text-decoration: underline'};
-    color: ${props => props.theme.accent};
+    ${props.underline && "text-decoration: underline"};
+    color: ${(props) => props.theme.accent};
   }
 `;
 

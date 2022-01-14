@@ -260,14 +260,13 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
     var payment_not_sent = false;
     var instructions_invoiced = false;
 
-    // console.log(
-    //   "actions:",
-    //   getState(),
-    //   party,
-    //   getState().contracts.contract,
-    //   getState().contracts.status_1,
-    //   getState().contracts.status_2
-    // );
+    console.log(
+      "actions:",
+      party,
+      //   getState().contracts.contract,
+      getState().contracts.status_1,
+      getState().contracts.status_2
+    );
 
     if (parseInt(party) == 1) {
       if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_CANCELED) {
@@ -279,7 +278,7 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         completion_message = true;
       }
       if (getState().contracts.status_2 == STATUS_TYPES.NO_INTERACTION) {
-        if (parseInt(getState().contracts.first_party_amount) > 0) {
+        if (parseInt(getState().contracts.contract.first_party_amount) > 0) {
           instructions_awaiting_counterparty_invoice = true;
         } else {
           instructions_awaiting_counterparty_deposit = true;
@@ -331,7 +330,7 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         completion_message = true;
       }
       if (getState().contracts.status_1 == STATUS_TYPES.NO_INTERACTION) {
-        if (parseInt(getState().contracts.second_party_amount) > 0) {
+        if (parseInt(getState().contracts.contract.second_party_amount) > 0) {
           instructions_awaiting_counterparty_invoice = true;
         } else {
           instructions_awaiting_counterparty_deposit = true;
