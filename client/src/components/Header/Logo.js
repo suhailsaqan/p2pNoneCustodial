@@ -18,6 +18,8 @@ const Logo = styled(Link)`
   }
 `;
 
-const HeaderLogo = () => <Logo to="/">Non-Custodial Lightning Contracts</Logo>;
+const HeaderLogo = () => (
+  <Logo to="/create">Non-Custodial Lightning Contracts ☁️ ⚡😶‍🌫️</Logo>
+);
 
 export default HeaderLogo;

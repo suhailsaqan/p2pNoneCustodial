@@ -62,7 +62,8 @@ class Party extends React.Component {
       instructions_awaiting_counterparty_invoice,
       instructions_awaiting_counterparty_deposit,
       invoice_container,
-      instructions_awaiting_settlement,
+      instructions_awaiting_settlement_invoice_submit,
+      instructions_awaiting_settlement_invoice_pay,
       payment_sent,
       payment_not_sent,
       instructions_invoiced,
@@ -78,7 +79,8 @@ class Party extends React.Component {
       instructions_awaiting_counterparty_invoice,
       instructions_awaiting_counterparty_deposit,
       invoice_container,
-      instructions_awaiting_settlement,
+      instructions_awaiting_settlement_invoice_submit,
+      instructions_awaiting_settlement_invoice_pay,
       payment_sent,
       payment_not_sent,
       instructions_invoiced
@@ -102,62 +104,66 @@ class Party extends React.Component {
 
     return (
       <Wrapper>
-        <Par>{contract.description}</Par>
-
         {this.props.party == 1 && <Par>First Party</Par>}
         {this.props.party == 2 && <Par>Second Party</Par>}
-
+        <Par>{contract.description}</Par>
         {this.props.party == 1 && <Par>Current Status: {status_1}</Par>}
         {this.props.party == 2 && <Par>Current Status: {status_2}</Par>}
-
         {invoice_form && (
           <InvoiceFormContainer id={contract._id} party={this.props.party} />
         )}
         {instructions && (
           <div>
             {instructions_invoiced && (
-              <Par>You have already submitted your invoice.</Par>
+              <Par>Your invoice has already been submitted</Par>
             )}
             {instructions_awaiting_counterparty_invoice && (
               <Par>
-                Please wait while your counterparty creates an invoice. Check
-                back later.
+                Your counterparty needs to submit an invoice. Please wait.
               </Par>
             )}{" "}
             {instructions_awaiting_counterparty_deposit && (
               <Par>
-                Please wait while your counterparty pays your invoice. Check
-                back later.{" "}
+                Your counterparty needs to pay your invoice. Please wait.
               </Par>
             )}
-            {instructions_awaiting_settlement && (
+            {instructions_awaiting_settlement_invoice_submit && (
+              <Par>The oracle will settle the contract soon.</Par>
+            )}
+            {instructions_awaiting_settlement_invoice_pay && (
               <Par>
-                Please await your settlement date (visible in the contract
-                details below) and contact your oracle for more info.
+                Funds have been deposited! The oracle will settle the contract
+                soon.
               </Par>
             )}
           </div>
         )}
         {invoice_container && (
           <div>
-            <Par>Deposit funds to this smart contract:</Par>
+            <Par>Please deposit funds to this invoice:</Par>
             <QRCode value={hodl_invoice} />
             <p>{hodl_invoice}</p>
           </div>
         )}
-        {payment_received && (
-          <Par>You received a payment from your counterparty</Par>
+        {/* {payment_received && (
+          <Par>You received a payment from your counterparty. ✅</Par>
         )}
         {payment_sent && (
-          <Par>Your payment to your counterparty went through</Par>
-        )}
+          <Par>Your payment to your counterparty went through. ✅</Par>
+        )} */}
         {payment_not_received && (
-          <Par>The oracle canceled a payment from your counterparty to you</Par>
+          <Par>
+            A payment from your counterparty to you has been canceled by the
+            oracle. ❌
+          </Par>
         )}
         {payment_not_sent && (
-          <Par>The oracle canceled a payment from you to your counterparty</Par>
+          <Par>
+            A payment from you to your counterparty has been canceled by the
+            oracle. ❌
+          </Par>
         )}
-        {completion_message && <Par>This contract is complete</Par>}
+        {completion_message && <Par>This contract is complete 🎉</Par>}
       </Wrapper>
     );
   }

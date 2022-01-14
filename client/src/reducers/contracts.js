@@ -114,8 +114,10 @@ export default (state = initialState, action) => {
         instructions_awaiting_counterparty_deposit:
           action.instructions_awaiting_counterparty_deposit,
         invoice_container: action.invoice_container,
-        instructions_awaiting_settlement:
-          action.instructions_awaiting_settlement,
+        instructions_awaiting_settlement_invoice_submit:
+          action.instructions_awaiting_settlement_invoice_submit,
+        instructions_awaiting_settlement_invoice_pay:
+          action.instructions_awaiting_settlement_invoice_pay,
         payment_sent: action.payment_sent,
         payment_not_sent: action.payment_not_sent,
         instructions_invoiced: action.instructions_invoiced,

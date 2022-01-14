@@ -11,9 +11,12 @@ import {
 const STATUS_TYPES = {
   NO_INTERACTION: "No interaction yet",
   CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
+  CONTRACT_PAID_AWAITING_SETTLEMENT: "Contract paid, awaiting settlement",
   CONTRACT_CANCELED: "Canceled",
   CONTRACT_SETTLED: "Settled",
   WAITING_ON_OTHER_PARTY: "Waiting on other party",
+  NEEDS_TO_PAY: "Needs to pay",
+  NEEDS_TO_SUBMIT_INVOICE: "Needs to submit invoice",
 };
 
 export const FETCH_CONTRACT_REQUEST = "FETCH_CONTRACT_REQUEST";
@@ -223,7 +226,8 @@ const setMessagesSuccess = (
   instructions_awaiting_counterparty_invoice,
   instructions_awaiting_counterparty_deposit,
   invoice_container,
-  instructions_awaiting_settlement,
+  instructions_awaiting_settlement_invoice_submit,
+  instructions_awaiting_settlement_invoice_pay,
   payment_sent,
   payment_not_sent,
   instructions_invoiced
@@ -237,7 +241,8 @@ const setMessagesSuccess = (
   instructions_awaiting_counterparty_invoice,
   instructions_awaiting_counterparty_deposit,
   invoice_container,
-  instructions_awaiting_settlement,
+  instructions_awaiting_settlement_invoice_submit,
+  instructions_awaiting_settlement_invoice_pay,
   payment_sent,
   payment_not_sent,
   instructions_invoiced,
@@ -255,7 +260,8 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
     var instructions_awaiting_counterparty_invoice = false;
     var instructions_awaiting_counterparty_deposit = false;
     var invoice_container = false;
-    var instructions_awaiting_settlement = false;
+    var instructions_awaiting_settlement_invoice_submit = false;
+    var instructions_awaiting_settlement_invoice_pay = false;
     var payment_sent = false;
     var payment_not_sent = false;
     var instructions_invoiced = false;
@@ -277,6 +283,9 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         payment_received = true;
         completion_message = true;
       }
+      if (getState().contracts.status_1 == STATUS_TYPES.NEEDS_TO_PAY) {
+        invoice_container = true;
+      }
       if (getState().contracts.status_2 == STATUS_TYPES.NO_INTERACTION) {
         if (parseInt(getState().contracts.contract.first_party_amount) > 0) {
           instructions_awaiting_counterparty_invoice = true;
@@ -285,16 +294,17 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         }
       }
       if (
-        getState().contracts.status_2 == STATUS_TYPES.WAITING_ON_OTHER_PARTY &&
-        getState().contracts.contract.first_party_hodl !== undefined
-      ) {
-        invoice_container = true; // show QR code
-      }
-      if (
-        getState().contracts.status_2 ==
+        getState().contracts.status_1 ==
         STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT
       ) {
-        instructions_awaiting_settlement = true;
+        instructions_awaiting_settlement_invoice_submit = true;
+        instructions = true;
+      }
+      if (
+        getState().contracts.status_1 ==
+        STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT
+      ) {
+        instructions_awaiting_settlement_invoice_pay = true;
         instructions = true;
       }
       if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_SETTLED) {
@@ -306,8 +316,7 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         completion_message = true;
       }
       if (
-        parseInt(getState().contracts.contract.second_party_amount) > 0 &&
-        getState().contracts.contract.first_party_hodl == undefined
+        getState().contracts.status_1 == STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE
       ) {
         invoice_form = true;
       }
@@ -329,6 +338,9 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         payment_received = true;
         completion_message = true;
       }
+      if (getState().contracts.status_2 == STATUS_TYPES.NEEDS_TO_PAY) {
+        invoice_container = true;
+      }
       if (getState().contracts.status_1 == STATUS_TYPES.NO_INTERACTION) {
         if (parseInt(getState().contracts.contract.second_party_amount) > 0) {
           instructions_awaiting_counterparty_invoice = true;
@@ -337,16 +349,17 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         }
       }
       if (
-        getState().contracts.status_1 == STATUS_TYPES.WAITING_ON_OTHER_PARTY &&
-        getState().contracts.contract.second_party_hodl !== undefined
-      ) {
-        invoice_container = true; // show QR code
-      }
-      if (
-        getState().contracts.status_1 ==
+        getState().contracts.status_2 ==
         STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT
       ) {
-        instructions_awaiting_settlement = true;
+        instructions_awaiting_settlement_invoice_submit = true;
+        instructions = true;
+      }
+      if (
+        getState().contracts.status_2 ==
+        STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT
+      ) {
+        instructions_awaiting_settlement_invoice_pay = true;
         instructions = true;
       }
       if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_SETTLED) {
@@ -358,20 +371,15 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         completion_message = true;
       }
       if (
-        parseInt(getState().contracts.contract.first_party_amount) > 0 &&
-        getState().contracts.contract.second_party_hodl == undefined
+        getState().contracts.status_2 == STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE
       ) {
         invoice_form = true;
       }
+      // CHECK WHAT THIS IS
       if (
         parseInt(getState().contracts.contract.first_party_amount) > 0 &&
         getState().contracts.contract.second_party_hodl !== undefined
       ) {
-        console.log(
-          "instructions_invoiced:",
-          parseInt(getState().contracts.contract.second_party_amount),
-          getState().contracts.contract.first_party_hodl
-        );
         instructions_invoiced = true;
       }
       if (invoice_form == false) {
@@ -388,7 +396,8 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         instructions_awaiting_counterparty_invoice,
         instructions_awaiting_counterparty_deposit,
         invoice_container,
-        instructions_awaiting_settlement,
+        instructions_awaiting_settlement_invoice_submit,
+        instructions_awaiting_settlement_invoice_pay,
         payment_sent,
         payment_not_sent,
         instructions_invoiced

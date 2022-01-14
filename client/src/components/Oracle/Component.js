@@ -46,9 +46,12 @@ class Oracle extends React.Component {
     if (!contract) return <Empty />;
     return (
       <Wrapper>
+        <p>ORACLE</p>
         <p>{contract.description}</p>
         <Grid>
-          <p>First Party</p>
+          <p>
+            <b>First Party</b>
+          </p>
           <p>Current Status: {status_1}</p>
           <Link to={`/party/${contract._id}/1`}>Page</Link>
           <div>
@@ -56,16 +59,20 @@ class Oracle extends React.Component {
               id={contract._id}
               status={status_1}
               party={1}
+              contract={contract}
             />
             <CancelButtonContainer
               id={contract._id}
               status={status_1}
               party={1}
+              contract={contract}
             />
           </div>
         </Grid>
         <Grid>
-          <p>Second Party</p>
+          <p>
+            <b>Second Party</b>
+          </p>
           <p>Current Status: {status_2}</p>
           <Link to={`/party/${contract._id}/2`}>Page</Link>
           <div>
@@ -73,11 +80,13 @@ class Oracle extends React.Component {
               id={contract._id}
               status={status_2}
               party={2}
+              contract={contract}
             />
             <CancelButtonContainer
               id={contract._id}
               status={status_2}
               party={2}
+              contract={contract}
             />
           </div>
         </Grid>

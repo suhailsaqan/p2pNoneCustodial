@@ -12,9 +12,12 @@ const { invoices, lightning, router } = require("../lightning/connect");
 const STATUS_TYPES = {
   NO_INTERACTION: "No interaction yet",
   CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
+  CONTRACT_PAID_AWAITING_SETTLEMENT: "Contract paid, awaiting settlement",
   CONTRACT_CANCELED: "Canceled",
   CONTRACT_SETTLED: "Settled",
   WAITING_ON_OTHER_PARTY: "Waiting on other party",
+  NEEDS_TO_PAY: "Needs to pay",
+  NEEDS_TO_SUBMIT_INVOICE: "Needs to submit invoice",
 };
 
 exports.getContract = async (req, res, next) => {
@@ -88,7 +91,27 @@ exports.getStatus = async (req, res, next) => {
     }
 
     if (parseInt(party) == 1 && contract.first_party_original == undefined) {
-      status = STATUS_TYPES.NO_INTERACTION;
+      if (contract.second_party_original == undefined) {
+        status = STATUS_TYPES.NO_INTERACTION;
+      }
+      if (
+        contract.second_party_original !== undefined &&
+        contract.second_party_amount == 0
+      ) {
+        pmthash = contract.second_party_pmthash;
+        details = await lookupInvoice(pmthash);
+        if (details.is_held) {
+          status = STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+        } else if (details.is_canceled) {
+          status = STATUS_TYPES.CONTRACT_CANCELED;
+        } else if (details.is_confirmed) {
+          status = STATUS_TYPES.CONTRACT_SETTLED;
+        } else {
+          status = STATUS_TYPES.NEEDS_TO_PAY;
+        }
+      } else {
+        status = STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+      }
     }
     if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
       console.log(contract.first_party_original);
@@ -105,11 +128,27 @@ exports.getStatus = async (req, res, next) => {
         status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
       }
     }
+
     if (parseInt(party) == 2 && contract.second_party_original == undefined) {
       if (contract.first_party_original == undefined) {
-        status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
-      } else {
         status = STATUS_TYPES.NO_INTERACTION;
+      } else if (
+        contract.first_party_original !== undefined &&
+        contract.first_party_amount == 0
+      ) {
+        pmthash = contract.first_party_pmthash;
+        details = await lookupInvoice(pmthash);
+        if (details.is_held) {
+          status = STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+        } else if (details.is_canceled) {
+          status = STATUS_TYPES.CONTRACT_CANCELED;
+        } else if (details.is_confirmed) {
+          status = STATUS_TYPES.CONTRACT_SETTLED;
+        } else {
+          status = STATUS_TYPES.NEEDS_TO_PAY;
+        }
+      } else {
+        status = STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
       }
     }
     if (parseInt(party) == 2 && contract.second_party_original !== undefined) {

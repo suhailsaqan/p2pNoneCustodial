@@ -63,7 +63,7 @@ class CreateContractForm extends React.Component {
               defaultValue="2018-01-01"
             />
             <Field
-              label="first party task"
+              label="first party's task"
               name="first_party_task"
               type="text"
               component={renderField}
@@ -77,14 +77,14 @@ class CreateContractForm extends React.Component {
               defaultValue="Bitcoin seller"
             />
             <Field
-              label="how much bitcoin will the first party send to the second party"
+              label="amount of bitcoin sent from first party to second party"
               name="first_party_amount"
               type="text"
               component={renderField}
               defaultValue="0"
             />
             <Field
-              label="how much bitcoin will the second party send to the first party"
+              label="amount of bitcoin sent from second party to first party"
               name="second_party_amount"
               type="text"
               component={renderField}
@@ -127,24 +127,24 @@ class CreateContractForm extends React.Component {
               name="first_party_task"
               type="text"
               component={renderField}
-              defaultValue="Bitcoin Lender"
+              defaultValue="Bitcoin buyer"
             />
             <Field
               label="second party's task"
               name="second_party_task"
               type="text"
               component={renderField}
-              defaultValue="Bitcoin Borrower"
+              defaultValue="Bitcoin seller"
             />
             <Field
-              label="how much will the first party send to the second party via bitcoin?"
+              label="amount of bitcoin sent from first party to second party"
               name="first_party_amount"
               type="text"
               component={renderField}
               defaultValue="0"
             />
             <Field
-              label="how much will the second party send to the first party via bitcoin?"
+              label="amount of bitcoin sent from second party to first party"
               name="second_party_amount"
               type="text"
               component={renderField}

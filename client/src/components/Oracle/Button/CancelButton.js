@@ -20,11 +20,21 @@ const CancelButtonStyle = styled(Button)`
 // allow: false,
 // block: true,
 
-let disable = (status) => {
+let disable = (status, contract, party) => {
   if (status == STATUS_TYPES.WAITING_ON_OTHER_PARTY) {
     console.log(status, STATUS_TYPES.WAITING_ON_OTHER_PARTY);
     return false;
   } else if (status == STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT) {
+    if (parseInt(party) === 1) {
+      if (contract.first_party_original == undefined) {
+        return true;
+      }
+    }
+    if (parseInt(party) === 2) {
+      if (contract.second_party_original == undefined) {
+        return true;
+      }
+    }
     return false;
   } else {
     return true;
@@ -36,7 +46,7 @@ const CancelButton = (props) => (
     onClick={() => {
       props.attemptCancelContract(props.id, props.party);
     }}
-    disabled={disable(props.status)}
+    disabled={disable(props.status, props.contract, props.party)}
   >
     Cancel
   </CancelButtonStyle>
