@@ -76,10 +76,96 @@ exports.createContract = async (req, res, next) => {
   }
 };
 
+async function getStatus(party, contract) {
+  if (parseInt(party) == 1 && contract.first_party_original == undefined) {
+    if (
+      contract.second_party_original == undefined &&
+      contract.second_party_amount > 0
+    ) {
+      return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+    }
+    if (
+      contract.second_party_original !== undefined &&
+      contract.second_party_amount == 0
+    ) {
+      pmthash = contract.second_party_pmthash;
+      details = await lookupInvoice(pmthash);
+      if (details.is_held) {
+        return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+      } else if (details.is_canceled) {
+        return STATUS_TYPES.CONTRACT_CANCELED;
+      } else if (details.is_confirmed) {
+        return STATUS_TYPES.CONTRACT_SETTLED;
+      } else {
+        return STATUS_TYPES.NEEDS_TO_PAY;
+      }
+    }
+  }
+  if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
+    if (contract.second_party_original !== undefined) {
+      return STATUS_TYPES.NEEDS_TO_PAY;
+    }
+    pmthash = contract.first_party_pmthash;
+    details = await lookupInvoice(pmthash);
+    console.log(details);
+    if (details.is_held) {
+      return STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
+    } else if (details.is_canceled) {
+      return STATUS_TYPES.CONTRACT_CANCELED;
+    } else if (details.is_confirmed) {
+      return STATUS_TYPES.CONTRACT_SETTLED;
+    } else {
+      return STATUS_TYPES.NO_INTERACTION;
+    }
+  }
+
+  if (parseInt(party) == 2 && contract.second_party_original == undefined) {
+    if (contract.first_party_original == undefined) {
+      return STATUS_TYPES.NO_INTERACTION;
+    } else if (
+      contract.first_party_original !== undefined &&
+      contract.first_party_amount == 0
+    ) {
+      pmthash = contract.first_party_pmthash;
+      details = await lookupInvoice(pmthash);
+      if (details.is_held) {
+        return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+      } else if (details.is_canceled) {
+        return STATUS_TYPES.CONTRACT_CANCELED;
+      } else if (details.is_confirmed) {
+        return STATUS_TYPES.CONTRACT_SETTLED;
+      } else {
+        return STATUS_TYPES.NEEDS_TO_PAY;
+      }
+    } else {
+      return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+    }
+  }
+  if (parseInt(party) == 2 && contract.second_party_original !== undefined) {
+    if (contract.first_party_original == undefined) {
+      return STATUS_TYPES.NEEDS_TO_PAY;
+    }
+
+    pmthash = contract.second_party_pmthash;
+    details = await lookupInvoice(pmthash);
+    console.log(details);
+    if (contract.first_party_original !== undefined) {
+      return STATUS_TYPES.NEEDS_TO_PAY;
+    } else if (details.is_held) {
+      return STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
+    } else if (details.is_canceled) {
+      return STATUS_TYPES.CONTRACT_CANCELED;
+    } else if (details.is_confirmed) {
+      return STATUS_TYPES.CONTRACT_SETTLED;
+    } else {
+      return STATUS_TYPES.NO_INTERACTION;
+    }
+  }
+}
+
 exports.getStatus = async (req, res, next) => {
   try {
     const { id, party } = req.params;
-    let status = null;
 
     if (parseInt(party) !== 1 && parseInt(party) !== 2) {
       return res.status(404).json({ message: "party can only be 1 or 2" });
@@ -90,87 +176,9 @@ exports.getStatus = async (req, res, next) => {
       return res.status(404).json({ message: "contract not found" });
     }
 
-    if (parseInt(party) == 1 && contract.first_party_original == undefined) {
-      if (contract.second_party_original == undefined) {
-        status = STATUS_TYPES.NO_INTERACTION;
-      }
-      if (
-        contract.second_party_original !== undefined &&
-        contract.second_party_amount == 0
-      ) {
-        pmthash = contract.second_party_pmthash;
-        details = await lookupInvoice(pmthash);
-        if (details.is_held) {
-          status = STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
-        } else if (details.is_canceled) {
-          status = STATUS_TYPES.CONTRACT_CANCELED;
-        } else if (details.is_confirmed) {
-          status = STATUS_TYPES.CONTRACT_SETTLED;
-        } else {
-          status = STATUS_TYPES.NEEDS_TO_PAY;
-        }
-      } else {
-        status = STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
-      }
-    }
-    if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
-      console.log(contract.first_party_original);
-      pmthash = contract.first_party_pmthash;
-      details = await lookupInvoice(pmthash);
-      console.log(details);
-      if (details.is_held) {
-        status = STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
-      } else if (details.is_canceled) {
-        status = STATUS_TYPES.CONTRACT_CANCELED;
-      } else if (details.is_confirmed) {
-        status = STATUS_TYPES.CONTRACT_SETTLED;
-      } else {
-        status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
-      }
-    }
+    const state = await getStatus(party, contract);
 
-    if (parseInt(party) == 2 && contract.second_party_original == undefined) {
-      if (contract.first_party_original == undefined) {
-        status = STATUS_TYPES.NO_INTERACTION;
-      } else if (
-        contract.first_party_original !== undefined &&
-        contract.first_party_amount == 0
-      ) {
-        pmthash = contract.first_party_pmthash;
-        details = await lookupInvoice(pmthash);
-        if (details.is_held) {
-          status = STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
-        } else if (details.is_canceled) {
-          status = STATUS_TYPES.CONTRACT_CANCELED;
-        } else if (details.is_confirmed) {
-          status = STATUS_TYPES.CONTRACT_SETTLED;
-        } else {
-          status = STATUS_TYPES.NEEDS_TO_PAY;
-        }
-      } else {
-        status = STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
-      }
-    }
-    if (parseInt(party) == 2 && contract.second_party_original !== undefined) {
-      if (contract.first_party_original == undefined) {
-        status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
-      } else {
-        status = STATUS_TYPES.NO_INTERACTION;
-      }
-      pmthash = contract.second_party_pmthash;
-      details = await lookupInvoice(pmthash);
-      console.log(details);
-      if (details.is_held) {
-        status = STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
-      } else if (details.is_canceled) {
-        status = STATUS_TYPES.CONTRACT_CANCELED;
-      } else if (details.is_confirmed) {
-        status = STATUS_TYPES.CONTRACT_SETTLED;
-      } else {
-        status = STATUS_TYPES.WAITING_ON_OTHER_PARTY;
-      }
-    }
-    return res.status(201).json(status);
+    return res.status(201).json(state);
   } catch (err) {
     next(err);
   }

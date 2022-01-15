@@ -45,8 +45,9 @@ class Party extends React.Component {
     if (
       this.props.status_1 !== prevProps.status_1 ||
       this.props.status_2 !== prevProps.status_2
-    )
+    ) {
       this.props.attemptSetMessages(this.props.party);
+    }
   }
 
   render() {
