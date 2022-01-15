@@ -63,8 +63,8 @@ class Party extends React.Component {
       instructions_awaiting_counterparty_invoice,
       instructions_awaiting_counterparty_deposit,
       invoice_container,
-      instructions_awaiting_settlement_invoice_submit,
-      instructions_awaiting_settlement_invoice_pay,
+      instructions_awaiting_settlement_invoice_submitted,
+      instructions_awaiting_settlement_invoice_paid,
       payment_sent,
       payment_not_sent,
       instructions_invoiced,
@@ -80,8 +80,8 @@ class Party extends React.Component {
       instructions_awaiting_counterparty_invoice,
       instructions_awaiting_counterparty_deposit,
       invoice_container,
-      instructions_awaiting_settlement_invoice_submit,
-      instructions_awaiting_settlement_invoice_pay,
+      instructions_awaiting_settlement_invoice_submitted,
+      instructions_awaiting_settlement_invoice_paid,
       payment_sent,
       payment_not_sent,
       instructions_invoiced
@@ -128,12 +128,12 @@ class Party extends React.Component {
                 Your counterparty needs to pay your invoice. Please wait.
               </Par>
             )}
-            {instructions_awaiting_settlement_invoice_submit && (
+            {instructions_awaiting_settlement_invoice_submitted && (
               <Par>The oracle will settle the contract soon.</Par>
             )}
-            {instructions_awaiting_settlement_invoice_pay && (
+            {instructions_awaiting_settlement_invoice_paid && (
               <Par>
-                Funds have been deposited! The oracle will settle the contract
+                You have paid your invoice! The oracle will settle the contract
                 soon.
               </Par>
             )}
@@ -146,12 +146,12 @@ class Party extends React.Component {
             <p>{hodl_invoice}</p>
           </div>
         )}
-        {/* {payment_received && (
+        {payment_received && (
           <Par>You received a payment from your counterparty. ✅</Par>
         )}
         {payment_sent && (
           <Par>Your payment to your counterparty went through. ✅</Par>
-        )} */}
+        )}
         {payment_not_received && (
           <Par>
             A payment from your counterparty to you has been canceled by the

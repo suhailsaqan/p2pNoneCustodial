@@ -9,7 +9,6 @@ import {
 } from "../util/api";
 
 const STATUS_TYPES = {
-  NO_INTERACTION: "No interaction yet",
   CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
   CONTRACT_PAID_AWAITING_SETTLEMENT: "Contract paid, awaiting settlement",
   CONTRACT_CANCELED: "Canceled",
@@ -226,8 +225,8 @@ const setMessagesSuccess = (
   instructions_awaiting_counterparty_invoice,
   instructions_awaiting_counterparty_deposit,
   invoice_container,
-  instructions_awaiting_settlement_invoice_submit,
-  instructions_awaiting_settlement_invoice_pay,
+  instructions_awaiting_settlement_invoice_submitted,
+  instructions_awaiting_settlement_invoice_paid,
   payment_sent,
   payment_not_sent,
   instructions_invoiced
@@ -241,8 +240,8 @@ const setMessagesSuccess = (
   instructions_awaiting_counterparty_invoice,
   instructions_awaiting_counterparty_deposit,
   invoice_container,
-  instructions_awaiting_settlement_invoice_submit,
-  instructions_awaiting_settlement_invoice_pay,
+  instructions_awaiting_settlement_invoice_submitted,
+  instructions_awaiting_settlement_invoice_paid,
   payment_sent,
   payment_not_sent,
   instructions_invoiced,
@@ -260,8 +259,8 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
     var instructions_awaiting_counterparty_invoice = false;
     var instructions_awaiting_counterparty_deposit = false;
     var invoice_container = false;
-    var instructions_awaiting_settlement_invoice_submit = false;
-    var instructions_awaiting_settlement_invoice_pay = false;
+    var instructions_awaiting_settlement_invoice_submitted = false;
+    var instructions_awaiting_settlement_invoice_paid = false;
     var payment_sent = false;
     var payment_not_sent = false;
     var instructions_invoiced = false;
@@ -280,16 +279,61 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         completion_message = true;
       }
       if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_SETTLED) {
-        payment_received = true;
-        completion_message = true;
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) == 0
+        ) {
+          payment_sent = true;
+          completion_message = true;
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) == 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_received = true;
+          completion_message = true;
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_received = true;
+          completion_message = true;
+        }
+      }
+      if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_CANCELED) {
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) == 0
+        ) {
+          payment_not_sent = true;
+          completion_message = true;
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) == 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_not_received = true;
+          completion_message = true;
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_not_received = true;
+          completion_message = true;
+        }
       }
       if (getState().contracts.status_1 == STATUS_TYPES.NEEDS_TO_PAY) {
         invoice_container = true;
       }
-      if (getState().contracts.status_2 == STATUS_TYPES.NO_INTERACTION) {
-        if (parseInt(getState().contracts.contract.first_party_amount) > 0) {
+      if (
+        getState().contracts.status_1 == STATUS_TYPES.WAITING_ON_OTHER_PARTY
+      ) {
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          getState().contracts.contract.second_party_original == undefined
+        ) {
           instructions_awaiting_counterparty_invoice = true;
-        } else {
+        } else if (
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
           instructions_awaiting_counterparty_deposit = true;
         }
       }
@@ -297,19 +341,15 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         getState().contracts.status_1 ==
         STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT
       ) {
-        instructions_awaiting_settlement_invoice_submit = true;
+        instructions_awaiting_settlement_invoice_submitted = true;
         instructions = true;
       }
       if (
         getState().contracts.status_1 ==
         STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT
       ) {
-        instructions_awaiting_settlement_invoice_pay = true;
+        instructions_awaiting_settlement_invoice_paid = true;
         instructions = true;
-      }
-      if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_SETTLED) {
-        payment_sent = true;
-        completion_message = true;
       }
       if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_CANCELED) {
         payment_not_sent = true;
@@ -335,16 +375,63 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         completion_message = true;
       }
       if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_SETTLED) {
-        payment_received = true;
-        completion_message = true;
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) == 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_sent = true;
+          completion_message = true;
+        }
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) == 0
+        ) {
+          payment_received = true;
+          completion_message = true;
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_received = true;
+          completion_message = true;
+        }
+      }
+      if (getState().contracts.status_2 == STATUS_TYPES.CONTRACT_CANCELED) {
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) == 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_not_sent = true;
+          completion_message = true;
+        }
+        if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) == 0
+        ) {
+          payment_not_received = true;
+          completion_message = true;
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0 &&
+          parseInt(getState().contracts.contract.second_party_amount) > 0
+        ) {
+          payment_not_received = true;
+          completion_message = true;
+        }
       }
       if (getState().contracts.status_2 == STATUS_TYPES.NEEDS_TO_PAY) {
         invoice_container = true;
       }
-      if (getState().contracts.status_1 == STATUS_TYPES.NO_INTERACTION) {
-        if (parseInt(getState().contracts.contract.second_party_amount) > 0) {
+      if (
+        getState().contracts.status_1 == STATUS_TYPES.WAITING_ON_OTHER_PARTY
+      ) {
+        if (
+          parseInt(getState().contracts.contract.second_party_amount) > 0 &&
+          getState().contracts.contract.first_party_original == undefined
+        ) {
           instructions_awaiting_counterparty_invoice = true;
-        } else {
+        } else if (
+          parseInt(getState().contracts.contract.first_party_amount) > 0
+        ) {
           instructions_awaiting_counterparty_deposit = true;
         }
       }
@@ -352,19 +439,15 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         getState().contracts.status_2 ==
         STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT
       ) {
-        instructions_awaiting_settlement_invoice_submit = true;
+        instructions_awaiting_settlement_invoice_submitted = true;
         instructions = true;
       }
       if (
         getState().contracts.status_2 ==
         STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT
       ) {
-        instructions_awaiting_settlement_invoice_pay = true;
+        instructions_awaiting_settlement_invoice_paid = true;
         instructions = true;
-      }
-      if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_SETTLED) {
-        payment_sent = true;
-        completion_message = true;
       }
       if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_CANCELED) {
         payment_not_sent = true;
@@ -375,7 +458,6 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
       ) {
         invoice_form = true;
       }
-      // CHECK WHAT THIS IS
       if (
         parseInt(getState().contracts.contract.first_party_amount) > 0 &&
         getState().contracts.contract.second_party_hodl !== undefined
@@ -396,8 +478,8 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
         instructions_awaiting_counterparty_invoice,
         instructions_awaiting_counterparty_deposit,
         invoice_container,
-        instructions_awaiting_settlement_invoice_submit,
-        instructions_awaiting_settlement_invoice_pay,
+        instructions_awaiting_settlement_invoice_submitted,
+        instructions_awaiting_settlement_invoice_paid,
         payment_sent,
         payment_not_sent,
         instructions_invoiced

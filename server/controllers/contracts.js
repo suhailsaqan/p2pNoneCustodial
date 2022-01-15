@@ -7,10 +7,8 @@ const {
   sendPayment,
   decodePayReq,
 } = require("../lightning/invoices");
-const { invoices, lightning, router } = require("../lightning/connect");
 
 const STATUS_TYPES = {
-  NO_INTERACTION: "No interaction yet",
   CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
   CONTRACT_PAID_AWAITING_SETTLEMENT: "Contract paid, awaiting settlement",
   CONTRACT_CANCELED: "Canceled",
@@ -78,18 +76,56 @@ exports.createContract = async (req, res, next) => {
 
 async function getStatus(party, contract) {
   if (parseInt(party) == 1 && contract.first_party_original == undefined) {
-    if (
-      contract.second_party_original == undefined &&
-      contract.second_party_amount > 0
-    ) {
-      return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+    if (contract.second_party_original == undefined) {
+      if (contract.second_party_amount > 0) {
+        return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+      } else {
+        return STATUS_TYPES.WAITING_ON_OTHER_PARTY;
+      }
+    } else if (contract.second_party_original !== undefined) {
+      if (contract.second_party_amount == 0) {
+        pmthash = contract.second_party_pmthash;
+        details = await lookupInvoice(pmthash);
+        if (details.is_held) {
+          // when first party pays to second party
+          return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+        } else if (details.is_canceled) {
+          return STATUS_TYPES.CONTRACT_CANCELED;
+        } else if (details.is_confirmed) {
+          return STATUS_TYPES.CONTRACT_SETTLED;
+        } else {
+          return STATUS_TYPES.NEEDS_TO_PAY;
+        }
+      } else {
+        return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+      }
     }
-    if (
-      contract.second_party_original !== undefined &&
-      contract.second_party_amount == 0
-    ) {
+  }
+  if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
+    pmthash = contract.first_party_pmthash;
+    details = await lookupInvoice(pmthash);
+    if (contract.second_party_original == undefined) {
+      if (details.is_held) {
+        return STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
+      } else if (details.is_canceled) {
+        return STATUS_TYPES.CONTRACT_CANCELED;
+      } else if (details.is_confirmed) {
+        return STATUS_TYPES.CONTRACT_SETTLED;
+      } else {
+        return STATUS_TYPES.WAITING_ON_OTHER_PARTY;
+      }
+    }
+    if (contract.second_party_original !== undefined) {
+      if (details.is_held) {
+        return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+      } else if (details.is_canceled) {
+        return STATUS_TYPES.CONTRACT_CANCELED;
+      } else if (details.is_confirmed) {
+        return STATUS_TYPES.CONTRACT_SETTLED;
+      }
       pmthash = contract.second_party_pmthash;
       details = await lookupInvoice(pmthash);
+      console.log(details);
       if (details.is_held) {
         return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
       } else if (details.is_canceled) {
@@ -99,35 +135,61 @@ async function getStatus(party, contract) {
       } else {
         return STATUS_TYPES.NEEDS_TO_PAY;
       }
-    }
-  }
-  if (parseInt(party) == 1 && contract.first_party_original !== undefined) {
-    if (contract.second_party_original !== undefined) {
-      return STATUS_TYPES.NEEDS_TO_PAY;
-    }
-    pmthash = contract.first_party_pmthash;
-    details = await lookupInvoice(pmthash);
-    console.log(details);
-    if (details.is_held) {
-      return STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
-    } else if (details.is_canceled) {
-      return STATUS_TYPES.CONTRACT_CANCELED;
-    } else if (details.is_confirmed) {
-      return STATUS_TYPES.CONTRACT_SETTLED;
-    } else {
-      return STATUS_TYPES.NO_INTERACTION;
     }
   }
 
   if (parseInt(party) == 2 && contract.second_party_original == undefined) {
     if (contract.first_party_original == undefined) {
-      return STATUS_TYPES.NO_INTERACTION;
-    } else if (
-      contract.first_party_original !== undefined &&
-      contract.first_party_amount == 0
-    ) {
+      if (contract.first_party_amount > 0) {
+        return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+      } else {
+        return STATUS_TYPES.WAITING_ON_OTHER_PARTY;
+      }
+    }
+    if (contract.first_party_original !== undefined) {
+      if (contract.first_party_amount == 0) {
+        pmthash = contract.first_party_pmthash;
+        details = await lookupInvoice(pmthash);
+        if (details.is_held) {
+          // when second party pays to first party
+          return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+        } else if (details.is_canceled) {
+          return STATUS_TYPES.CONTRACT_CANCELED;
+        } else if (details.is_confirmed) {
+          return STATUS_TYPES.CONTRACT_SETTLED;
+        } else {
+          return STATUS_TYPES.NEEDS_TO_PAY;
+        }
+      } else {
+        return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
+      }
+    }
+  }
+  if (parseInt(party) == 2 && contract.second_party_original !== undefined) {
+    pmthash = contract.second_party_pmthash;
+    details = await lookupInvoice(pmthash);
+    if (contract.first_party_original == undefined) {
+      if (details.is_held) {
+        return STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
+      } else if (details.is_canceled) {
+        return STATUS_TYPES.CONTRACT_CANCELED;
+      } else if (details.is_confirmed) {
+        return STATUS_TYPES.CONTRACT_SETTLED;
+      } else {
+        return STATUS_TYPES.WAITING_ON_OTHER_PARTY;
+      }
+    }
+    if (contract.first_party_original !== undefined) {
+      if (details.is_held) {
+        return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
+      } else if (details.is_canceled) {
+        return STATUS_TYPES.CONTRACT_CANCELED;
+      } else if (details.is_confirmed) {
+        return STATUS_TYPES.CONTRACT_SETTLED;
+      }
       pmthash = contract.first_party_pmthash;
       details = await lookupInvoice(pmthash);
+      console.log(details);
       if (details.is_held) {
         return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
       } else if (details.is_canceled) {
@@ -137,28 +199,6 @@ async function getStatus(party, contract) {
       } else {
         return STATUS_TYPES.NEEDS_TO_PAY;
       }
-    } else {
-      return STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE;
-    }
-  }
-  if (parseInt(party) == 2 && contract.second_party_original !== undefined) {
-    if (contract.first_party_original == undefined) {
-      return STATUS_TYPES.NEEDS_TO_PAY;
-    }
-
-    pmthash = contract.second_party_pmthash;
-    details = await lookupInvoice(pmthash);
-    console.log(details);
-    if (contract.first_party_original !== undefined) {
-      return STATUS_TYPES.NEEDS_TO_PAY;
-    } else if (details.is_held) {
-      return STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT;
-    } else if (details.is_canceled) {
-      return STATUS_TYPES.CONTRACT_CANCELED;
-    } else if (details.is_confirmed) {
-      return STATUS_TYPES.CONTRACT_SETTLED;
-    } else {
-      return STATUS_TYPES.NO_INTERACTION;
     }
   }
 }

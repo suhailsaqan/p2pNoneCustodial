@@ -1,5 +1,4 @@
 export const STATUS_TYPES = {
-  NO_INTERACTION: "No interaction yet",
   CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
   CONTRACT_PAID_AWAITING_SETTLEMENT: "Contract paid, awaiting settlement",
   CONTRACT_CANCELED: "Canceled",

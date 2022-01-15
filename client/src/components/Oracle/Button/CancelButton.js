@@ -22,7 +22,6 @@ const CancelButtonStyle = styled(Button)`
 
 let disable = (status, contract, party) => {
   if (status == STATUS_TYPES.WAITING_ON_OTHER_PARTY) {
-    console.log(status, STATUS_TYPES.WAITING_ON_OTHER_PARTY);
     return false;
   } else if (status == STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT) {
     if (parseInt(party) === 1) {

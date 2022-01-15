@@ -23,10 +23,10 @@ export const mapStateToProps = (state) => ({
   instructions_awaiting_counterparty_deposit:
     state.contracts.instructions_awaiting_counterparty_deposit,
   invoice_container: state.contracts.invoice_container,
-  instructions_awaiting_settlement_invoice_submit:
-    state.contracts.instructions_awaiting_settlement_invoice_submit,
-  instructions_awaiting_settlement_invoice_pay:
-    state.contracts.instructions_awaiting_settlement_invoice_pay,
+  instructions_awaiting_settlement_invoice_submitted:
+    state.contracts.instructions_awaiting_settlement_invoice_submitted,
+  instructions_awaiting_settlement_invoice_paid:
+    state.contracts.instructions_awaiting_settlement_invoice_paid,
   payment_sent: state.contracts.payment_sent,
   payment_not_sent: state.contracts.payment_not_sent,
   instructions_invoiced: state.contracts.instructions_invoiced,

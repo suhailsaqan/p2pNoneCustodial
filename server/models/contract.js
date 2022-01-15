@@ -28,11 +28,3 @@ const contractSchema = new Schema({
 const Contract = mongoose.model("Contract", contractSchema);
 
 module.exports = Contract;
-
-const MESSAGE_TYPES = {
-  NO_INTERACTION: "no interaction",
-  CONTRACT_FUNDED_AWAITING_SETTLEMENT: "contract funded, awaiting settlement",
-  CONTRACT_CANCELED: "canceled",
-  CONTRACT_SETTLED: "settled",
-  WAITING_ON_OTHER_PARTY: "waiting on other party",
-};
