@@ -92,3 +92,11 @@ export async function cancelContract(id, party) {
 export async function addInvoice(id, party, invoice) {
   return await methods.post(`invoice`, { id, party, invoice });
 }
+
+export async function getSettleStatus(id, party) {
+  return await methods.get(`settle/status/${id}/${party}`);
+}
+
+export async function getCancelStatus(id, party) {
+  return await methods.get(`cancel/status/${id}/${party}`);
+}

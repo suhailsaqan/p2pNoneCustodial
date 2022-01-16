@@ -116,9 +116,7 @@ async function getStatus(party, contract) {
       }
     }
     if (contract.second_party_original !== undefined) {
-      if (details.is_held) {
-        return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
-      } else if (details.is_canceled) {
+      if (details.is_canceled) {
         return STATUS_TYPES.CONTRACT_CANCELED;
       } else if (details.is_confirmed) {
         return STATUS_TYPES.CONTRACT_SETTLED;
@@ -180,9 +178,7 @@ async function getStatus(party, contract) {
       }
     }
     if (contract.first_party_original !== undefined) {
-      if (details.is_held) {
-        return STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT;
-      } else if (details.is_canceled) {
+      if (details.is_canceled) {
         return STATUS_TYPES.CONTRACT_CANCELED;
       } else if (details.is_confirmed) {
         return STATUS_TYPES.CONTRACT_SETTLED;
@@ -257,6 +253,78 @@ exports.t = async (req, res, next) => {
   }
 };
 
+async function getSettleStatus(party, contract) {
+  ret = {};
+  if (parseInt(party) == 0) {
+    const status_1 = await getStatus(1, contract);
+    if (
+      contract.first_party_original !== undefined &&
+      (status_1 == STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT ||
+        status_1 == STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT)
+    ) {
+      ret[1] = true;
+    } else {
+      ret[1] = false;
+    }
+    const status_2 = await getStatus(2, contract);
+    if (
+      contract.second_party_original !== undefined &&
+      (status_2 == STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT ||
+        status_2 == STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT)
+    ) {
+      ret[2] = true;
+    } else {
+      ret[2] = false;
+    }
+    return ret;
+  } else {
+    const status = await getStatus(party, contract);
+    if (parseInt(party) == 1) {
+      invoice = contract.first_party_original;
+    } else if (parseInt(party) == 2) {
+      invoice = contract.second_party_original;
+    }
+    if (
+      invoice !== undefined &&
+      (status == STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT ||
+        status == STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT)
+    ) {
+      ret[party] = true;
+    } else {
+      ret[party] = false;
+    }
+    return ret;
+  }
+}
+
+exports.getSettleStatus = async (req, res, next) => {
+  try {
+    const { id, party } = req.params;
+
+    const contract = await Contract.findById(id);
+    if (contract == null) {
+      return res.status(404).json({ message: "contract not found" });
+    }
+
+    if (
+      parseInt(party) !== 1 &&
+      parseInt(party) !== 2 &&
+      parseInt(party) !== 0
+    ) {
+      return res
+        .status(404)
+        .json({ message: "party can only be 1, 2 or 0 (for both parties)" });
+    }
+
+    const settleState = await getSettleStatus(party, contract);
+    return res.status(201).json(settleState);
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
+  }
+};
+
 exports.settleContract = async (req, res, next) => {
   try {
     // TODO: check the status of the contract to be able to settle it
@@ -307,6 +375,78 @@ exports.settleContract = async (req, res, next) => {
     } else {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }
+  } catch (err) {
+    if (err.name === "CastError")
+      return res.status(400).json({ message: "invalid contract id" });
+    return next(err);
+  }
+};
+
+async function getCancelStatus(party, contract) {
+  ret = {};
+  if (parseInt(party) == 0) {
+    const status_1 = await getStatus(1, contract);
+    if (
+      status_1 == STATUS_TYPES.CONTRACT_CANCELED ||
+      status_1 == STATUS_TYPES.CONTRACT_SETTLED ||
+      contract.first_party_original == undefined
+    ) {
+      ret[1] = false;
+    } else {
+      ret[1] = true;
+    }
+    const status_2 = await getStatus(2, contract);
+    if (
+      status_2 == STATUS_TYPES.CONTRACT_CANCELED ||
+      status_2 == STATUS_TYPES.CONTRACT_SETTLED ||
+      contract.second_party_original == undefined
+    ) {
+      ret[2] = false;
+    } else {
+      ret[2] = true;
+    }
+    return ret;
+  } else {
+    const status = await getStatus(party, contract);
+    if (parseInt(party) == 1) {
+      invoice = contract.first_party_original;
+    } else if (parseInt(party) == 2) {
+      invoice = contract.second_party_original;
+    }
+    if (
+      status == STATUS_TYPES.CONTRACT_CANCELED ||
+      status == STATUS_TYPES.CONTRACT_SETTLED ||
+      invoice == undefined
+    ) {
+      ret[party] = false;
+    } else {
+      ret[party] = true;
+    }
+    return ret;
+  }
+}
+
+exports.getCancelStatus = async (req, res, next) => {
+  try {
+    const { id, party } = req.params;
+
+    const contract = await Contract.findById(id);
+    if (contract == null) {
+      return res.status(404).json({ message: "contract not found" });
+    }
+
+    if (
+      parseInt(party) !== 1 &&
+      parseInt(party) !== 2 &&
+      parseInt(party) !== 0
+    ) {
+      return res
+        .status(404)
+        .json({ message: "party can only be 1, 2 or 0 (for both parties)" });
+    }
+
+    const cancelState = await getCancelStatus(party, contract);
+    return res.status(201).json(cancelState);
   } catch (err) {
     if (err.name === "CastError")
       return res.status(400).json({ message: "invalid contract id" });

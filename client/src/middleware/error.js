@@ -19,6 +19,10 @@ import {
   ADD_INVOICE_ERROR,
   SET_MESSAGES_SUCCESS,
   SET_MESSAGES_ERROR,
+  FETCH_SETTLE_STATUS_SUCCESS,
+  FETCH_SETTLE_STATUS_ERROR,
+  FETCH_CANCEL_STATUS_SUCCESS,
+  FETCH_CANCEL_STATUS_ERROR,
 } from "../actions/contracts";
 import { hideErrorClearTimeout, showErrorWithTimeout } from "../actions/error";
 
@@ -35,6 +39,8 @@ export default (store) => (next) => (action) => {
     case CANCEL_CONTRACT_SUCCESS:
     case ADD_INVOICE_SUCCESS:
     case SET_MESSAGES_SUCCESS:
+    case FETCH_SETTLE_STATUS_SUCCESS:
+    case FETCH_CANCEL_STATUS_SUCCESS:
       if (store.getState().error) store.dispatch(hideErrorClearTimeout());
       break;
 
@@ -48,6 +54,8 @@ export default (store) => (next) => (action) => {
     case CANCEL_CONTRACT_ERROR:
     case ADD_INVOICE_ERROR:
     case SET_MESSAGES_ERROR:
+    case FETCH_SETTLE_STATUS_ERROR:
+    case FETCH_CANCEL_STATUS_ERROR:
       store.dispatch(showErrorWithTimeout(action.error));
       break;
 

@@ -44,7 +44,7 @@ const SettleButton = (props) => (
     onClick={() => {
       props.attemptSettleContract(props.id, props.party);
     }}
-    disabled={disable(props.status, props.contract, props.party)}
+    disabled={!props.status}
   >
     Settle
   </SettleButtonStyle>

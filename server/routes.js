@@ -14,7 +14,10 @@ router.post("/contract", contracts.createContract);
 router.get("/status/:id/:party", contracts.getStatus);
 
 router.post("/settle", contracts.settleContract);
+router.get("/settle/status/:id/:party", contracts.getSettleStatus);
+
 router.post("/cancel", contracts.cancelContract);
+router.get("/cancel/status/:id/:party", contracts.getCancelStatus);
 
 router.post("/invoice", contracts.addInvoice);
 

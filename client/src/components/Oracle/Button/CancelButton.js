@@ -45,7 +45,7 @@ const CancelButton = (props) => (
     onClick={() => {
       props.attemptCancelContract(props.id, props.party);
     }}
-    disabled={disable(props.status, props.contract, props.party)}
+    disabled={!props.status}
   >
     Cancel
   </CancelButtonStyle>

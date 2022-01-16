@@ -29,6 +29,12 @@ import {
   SET_MESSAGES_REQUEST,
   SET_MESSAGES_SUCCESS,
   SET_MESSAGES_ERROR,
+  FETCH_SETTLE_STATUS_REQUEST,
+  FETCH_SETTLE_STATUS_SUCCESS,
+  FETCH_SETTLE_STATUS_ERROR,
+  FETCH_CANCEL_STATUS_REQUEST,
+  FETCH_CANCEL_STATUS_SUCCESS,
+  FETCH_CANCEL_STATUS_ERROR,
 } from "../actions/contracts";
 
 const initialState = { isFetching: false, items: [] };
@@ -55,13 +61,6 @@ export default (state = initialState, action) => {
       return { ...state, isFetching: false, newContract: action.contract };
     case CREATE_CONTRACT_ERROR:
       return { ...state, isFetching: false, error: action.error };
-
-    // case FETCH_STATUS_REQUEST:
-    //   return { ...state, isFetching: true, status: null};
-    // case FETCH_STATUS_SUCCESS:
-    //   return { ...state, isFetching: false, status: action.status };
-    // case FETCH_STATUS_ERROR:
-    //   return { ...state, isFetching: false };
 
     case FETCH_STATUS_1_REQUEST:
       return { ...state, isFetching: true, status_1: null };
@@ -123,6 +122,30 @@ export default (state = initialState, action) => {
         instructions_invoiced: action.instructions_invoiced,
       };
     case SET_MESSAGES_ERROR:
+      return { ...state, isFetching: false };
+
+    case FETCH_SETTLE_STATUS_REQUEST:
+      return { ...state, isFetching: true, status_1: null };
+    case FETCH_SETTLE_STATUS_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        settle_status_1: action.status["1"],
+        settle_status_2: action.status["2"],
+      };
+    case FETCH_SETTLE_STATUS_ERROR:
+      return { ...state, isFetching: false };
+
+    case FETCH_CANCEL_STATUS_REQUEST:
+      return { ...state, isFetching: true };
+    case FETCH_CANCEL_STATUS_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        cancel_status_1: action.status["1"],
+        cancel_status_2: action.status["2"],
+      };
+    case FETCH_CANCEL_STATUS_ERROR:
       return { ...state, isFetching: false };
 
     default:

@@ -28,6 +28,8 @@ class Oracle extends React.Component {
     this.props.fetchContract(this.props.id);
     this.props.fetchStatus(this.props.id, 1);
     this.props.fetchStatus(this.props.id, 2);
+    this.props.fetchSettleStatus(this.props.id, 0);
+    this.props.fetchCancelStatus(this.props.id, 0);
   }
 
   // Fix this history issue:
@@ -41,7 +43,21 @@ class Oracle extends React.Component {
   //   }
 
   render() {
-    const { contract, status_1, status_2 } = this.props;
+    const {
+      contract,
+      status_1,
+      status_2,
+      settle_status_1,
+      cancel_status_1,
+      settle_status_2,
+      cancel_status_2,
+    } = this.props;
+    console.log(
+      settle_status_1,
+      cancel_status_1,
+      settle_status_2,
+      cancel_status_2
+    );
     if (this.props.isFetching) return <LoadingIndicatorBox />;
     if (!contract) return <Empty />;
     return (
@@ -57,13 +73,13 @@ class Oracle extends React.Component {
           <div>
             <SettleButtonContainer
               id={contract._id}
-              status={status_1}
+              status={settle_status_1}
               party={1}
               contract={contract}
             />
             <CancelButtonContainer
               id={contract._id}
-              status={status_1}
+              status={cancel_status_1}
               party={1}
               contract={contract}
             />
@@ -78,13 +94,13 @@ class Oracle extends React.Component {
           <div>
             <SettleButtonContainer
               id={contract._id}
-              status={status_2}
+              status={settle_status_2}
               party={2}
               contract={contract}
             />
             <CancelButtonContainer
               id={contract._id}
-              status={status_2}
+              status={cancel_status_2}
               party={2}
               contract={contract}
             />

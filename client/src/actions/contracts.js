@@ -6,6 +6,8 @@ import {
   settleContract,
   cancelContract,
   addInvoice,
+  getSettleStatus,
+  getCancelStatus,
 } from "../util/api";
 
 const STATUS_TYPES = {
@@ -487,5 +489,53 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
     );
   } catch (error) {
     dispatch(setMessagesError(error));
+  }
+};
+
+export const FETCH_SETTLE_STATUS_REQUEST = "FETCH_SETTLE_STATUS_REQUEST";
+export const FETCH_SETTLE_STATUS_SUCCESS = "FETCH_SETTLE_STATUS_SUCCESS";
+export const FETCH_SETTLE_STATUS_ERROR = "FETCH_SETTLE_STATUS_ERROR";
+
+const fetchSettleStatusRequest = { type: FETCH_SETTLE_STATUS_REQUEST };
+const fetchSettleStatusSuccess = (status) => ({
+  type: FETCH_SETTLE_STATUS_SUCCESS,
+  status,
+});
+const fetchSettleStatusError = (error) => ({
+  type: FETCH_SETTLE_STATUS_ERROR,
+  error,
+});
+
+export const fetchSettleStatus = (id, party) => async (dispatch) => {
+  dispatch(fetchSettleStatusRequest);
+  try {
+    const status = await getSettleStatus(id, party);
+    dispatch(fetchSettleStatusSuccess(status));
+  } catch (error) {
+    dispatch(fetchSettleStatusError(error));
+  }
+};
+
+export const FETCH_CANCEL_STATUS_REQUEST = "FETCH_CANCEL_STATUS_REQUEST";
+export const FETCH_CANCEL_STATUS_SUCCESS = "FETCH_CANCEL_STATUS_SUCCESS";
+export const FETCH_CANCEL_STATUS_ERROR = "FETCH_CANCEL_STATUS_ERROR";
+
+const fetchCancelStatusRequest = { type: FETCH_CANCEL_STATUS_REQUEST };
+const fetchCancelStatusSuccess = (status) => ({
+  type: FETCH_CANCEL_STATUS_SUCCESS,
+  status,
+});
+const fetchCancelStatusError = (error) => ({
+  type: FETCH_CANCEL_STATUS_ERROR,
+  error,
+});
+
+export const fetchCancelStatus = (id, party) => async (dispatch) => {
+  dispatch(fetchCancelStatusRequest);
+  try {
+    const status = await getCancelStatus(id, party);
+    dispatch(fetchCancelStatusSuccess(status));
+  } catch (error) {
+    dispatch(fetchCancelStatusError(error));
   }
 };
