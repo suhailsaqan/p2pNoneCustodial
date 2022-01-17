@@ -26,8 +26,7 @@ const Grid = styled.div`
 class Oracle extends React.Component {
   componentDidMount() {
     this.props.fetchContract(this.props.id);
-    this.props.fetchStatus(this.props.id, 1);
-    this.props.fetchStatus(this.props.id, 2);
+    this.props.fetchStatus(this.props.id, 0);
     this.props.fetchSettleStatus(this.props.id, 0);
     this.props.fetchCancelStatus(this.props.id, 0);
   }
@@ -53,6 +52,10 @@ class Oracle extends React.Component {
       cancel_status_2,
     } = this.props;
     console.log(
+      "status_1",
+      status_1,
+      "status_2",
+      status_2,
       settle_status_1,
       cancel_status_1,
       settle_status_2,

@@ -86,58 +86,24 @@ export const attemptCreateContract = (contract) => async (
   }
 };
 
-// export const FETCH_STATUS_REQUEST = "FETCH_STATUS_REQUEST";
-// export const FETCH_STATUS_SUCCESS = "FETCH_STATUS_SUCCESS";
-// export const FETCH_STATUS_ERROR = "FETCH_STATUS_ERROR";
+export const FETCH_STATUS_REQUEST = "FETCH_STATUS_REQUEST";
+export const FETCH_STATUS_SUCCESS = "FETCH_STATUS_SUCCESS";
+export const FETCH_STATUS_ERROR = "FETCH_STATUS_ERROR";
 
-export const FETCH_STATUS_1_REQUEST = "FETCH_STATUS_1_REQUEST";
-export const FETCH_STATUS_1_SUCCESS = "FETCH_STATUS_1_SUCCESS";
-export const FETCH_STATUS_1_ERROR = "FETCH_STATUS_1_ERROR";
-
-export const FETCH_STATUS_2_REQUEST = "FETCH_STATUS_2_REQUEST";
-export const FETCH_STATUS_2_SUCCESS = "FETCH_STATUS_2_SUCCESS";
-export const FETCH_STATUS_2_ERROR = "FETCH_STATUS_2_ERROR";
-
-// const fetchStatusRequest = { type: FETCH_STATUS_REQUEST };
-// const fetchStatusSuccess = (status) => ({
-//   type: FETCH_STATUS_SUCCESS,
-//   status,
-// });
-// const fetchStatusError = (error) => ({ type: FETCH_STATUS_ERROR, error });
-
-const fetchStatus1Request = { type: FETCH_STATUS_1_REQUEST };
-const fetchStatus1Success = (status) => ({
-  type: FETCH_STATUS_1_SUCCESS,
+const fetchStatusRequest = { type: FETCH_STATUS_REQUEST };
+const fetchStatusSuccess = (status) => ({
+  type: FETCH_STATUS_SUCCESS,
   status,
 });
-const fetchStatus1Error = (error) => ({ type: FETCH_STATUS_1_ERROR, error });
+const fetchStatusError = (error) => ({ type: FETCH_STATUS_ERROR, error });
 
-const fetchStatus2Request = { type: FETCH_STATUS_2_REQUEST };
-const fetchStatus2Success = (status) => ({
-  type: FETCH_STATUS_2_SUCCESS,
-  status,
-});
-const fetchStatus2Error = (error) => ({ type: FETCH_STATUS_2_ERROR, error });
-
-export const fetchStatus = (id = "", party = "") => async (dispatch) => {
-  let request, success, error;
-  if (parseInt(party) === 1) {
-    request = fetchStatus1Request;
-    success = fetchStatus1Success;
-    error = fetchStatus1Error;
-  } else if (parseInt(party) === 2) {
-    request = fetchStatus2Request;
-    success = fetchStatus2Success;
-    error = fetchStatus2Error;
-  } else {
-    return "party can only be 1 or 2";
-  }
-  dispatch(request);
+export const fetchStatus = (id, party) => async (dispatch) => {
+  dispatch(fetchStatusRequest);
   try {
     const status = await getStatus(id, party);
-    dispatch(success(status));
+    dispatch(fetchStatusSuccess(status));
   } catch (err) {
-    dispatch(error(err));
+    dispatch(fetchStatusError(err));
   }
 };
 

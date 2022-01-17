@@ -1,6 +1,4 @@
-// const { invoices, lightning, router } = require("./connect");
 const lnd = require("./connect");
-// console.log(lnd);
 const {
   getInvoice,
   cancelHodlInvoice,
@@ -26,7 +24,6 @@ const times = 1000;
   tokens: <Tokens Number>
 }*/
 
-// needs hex, not buffer bytes
 // needs the date it will expire
 const createHoldInvoice = async (expiresAt, hash, amount) => {
   try {
@@ -43,8 +40,6 @@ const createHoldInvoice = async (expiresAt, hash, amount) => {
   }
 };
 
-// DOES NOT RETURN ANYTHING
-// needs preimage
 const settleHoldInvoice = async (secret) => {
   try {
     await settleHodlInvoice({ lnd: lnd, secret: secret });
@@ -54,7 +49,6 @@ const settleHoldInvoice = async (secret) => {
   }
 };
 
-// DOES NOT RETURN ANYTHING
 const cancelHoldInvoice = async (hash) => {
   try {
     await cancelHodlInvoice({ lnd: lnd, id: hash });
@@ -110,7 +104,6 @@ const cancelHoldInvoice = async (hash) => {
   secret: <Secret Preimage Hex String>
   tokens: <Tokens Number>
 }*/
-// DONE
 const lookupInvoice = async (id) => {
   try {
     const invoiceDetails = await getInvoice({ lnd: lnd, id: id });
@@ -187,7 +180,6 @@ const sendPayment = async (payment_request, timeout_seconds, fee_limit_sat) => {
   safe_tokens: <Requested Tokens Rounded Up Number>
   tokens: <Requested Tokens Rounded Down Number>
 }*/
-
 const decodePayReq = async (pay_req) => {
   try {
     const details = await decodePaymentRequest({ lnd: lnd, request: pay_req });

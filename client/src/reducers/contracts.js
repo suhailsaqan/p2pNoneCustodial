@@ -8,15 +8,9 @@ import {
   CREATE_CONTRACT_REQUEST,
   CREATE_CONTRACT_SUCCESS,
   CREATE_CONTRACT_ERROR,
-  // FETCH_STATUS_REQUEST,
-  // FETCH_STATUS_SUCCESS,
-  // FETCH_STATUS_ERROR,
-  FETCH_STATUS_1_REQUEST,
-  FETCH_STATUS_1_SUCCESS,
-  FETCH_STATUS_1_ERROR,
-  FETCH_STATUS_2_REQUEST,
-  FETCH_STATUS_2_SUCCESS,
-  FETCH_STATUS_2_ERROR,
+  FETCH_STATUS_REQUEST,
+  FETCH_STATUS_SUCCESS,
+  FETCH_STATUS_ERROR,
   SETTLE_CONTRACT_REQUEST,
   SETTLE_CONTRACT_SUCCESS,
   SETTLE_CONTRACT_ERROR,
@@ -62,18 +56,16 @@ export default (state = initialState, action) => {
     case CREATE_CONTRACT_ERROR:
       return { ...state, isFetching: false, error: action.error };
 
-    case FETCH_STATUS_1_REQUEST:
+    case FETCH_STATUS_REQUEST:
       return { ...state, isFetching: true, status_1: null };
-    case FETCH_STATUS_1_SUCCESS:
-      return { ...state, isFetching: false, status_1: action.status };
-    case FETCH_STATUS_1_ERROR:
-      return { ...state, isFetching: false };
-
-    case FETCH_STATUS_2_REQUEST:
-      return { ...state, isFetching: true, status_2: null };
-    case FETCH_STATUS_2_SUCCESS:
-      return { ...state, isFetching: false, status_2: action.status };
-    case FETCH_STATUS_2_ERROR:
+    case FETCH_STATUS_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        status_1: action.status["1"],
+        status_2: action.status["2"],
+      };
+    case FETCH_STATUS_ERROR:
       return { ...state, isFetching: false };
 
     case SETTLE_CONTRACT_REQUEST:

@@ -201,10 +201,18 @@ async function getStatus(party, contract) {
 
 exports.getStatus = async (req, res, next) => {
   try {
+    let ret = {};
+
     const { id, party } = req.params;
 
-    if (parseInt(party) !== 1 && parseInt(party) !== 2) {
-      return res.status(404).json({ message: "party can only be 1 or 2" });
+    if (
+      parseInt(party) !== 1 &&
+      parseInt(party) !== 2 &&
+      parseInt(party) !== 0
+    ) {
+      return res
+        .status(404)
+        .json({ error: "party can only be 1, 2 or 0 (for both parties)" });
     }
 
     const contract = await Contract.findById(id);
@@ -212,9 +220,16 @@ exports.getStatus = async (req, res, next) => {
       return res.status(404).json({ message: "contract not found" });
     }
 
-    const state = await getStatus(party, contract);
+    if (parseInt(party) == 1) {
+      ret[1] = await getStatus(1, contract);
+    } else if (parseInt(party) == 2) {
+      ret[2] = await getStatus(2, contract);
+    } else if (parseInt(party) == 0) {
+      ret[1] = await getStatus(1, contract);
+      ret[2] = await getStatus(2, contract);
+    }
 
-    return res.status(201).json(state);
+    return res.status(201).json(ret);
   } catch (err) {
     next(err);
   }
@@ -313,7 +328,7 @@ exports.getSettleStatus = async (req, res, next) => {
     ) {
       return res
         .status(404)
-        .json({ message: "party can only be 1, 2 or 0 (for both parties)" });
+        .json({ error: "party can only be 1, 2 or 0 (for both parties)" });
     }
 
     const settleState = await getSettleStatus(party, contract);
@@ -332,7 +347,15 @@ exports.settleContract = async (req, res, next) => {
 
     const contract = await Contract.findById(id);
     if (contract == null) {
-      return res.status(404).json({ message: "contract not found" });
+      return res.status(404).json({ error: "contract not found" });
+    }
+
+    const allowed = await getSettleStatus(party, contract);
+
+    if (allowed[party] == false) {
+      return res
+        .status(400)
+        .json({ error: "contract cannot be settled at this time" });
     }
 
     if (parseInt(party) == 1) {
@@ -352,7 +375,7 @@ exports.settleContract = async (req, res, next) => {
 
           return res.status(201).json(contract);
         }
-        res.status(400).json({ error: "paid.is_confirmed" });
+        // res.status(400).json({ error: "paid.is_confirmed" });
       } else {
         res.status(400).json({ error: "!invoiceDetails.is_canceled" });
       }
@@ -432,7 +455,15 @@ exports.getCancelStatus = async (req, res, next) => {
 
     const contract = await Contract.findById(id);
     if (contract == null) {
-      return res.status(404).json({ message: "contract not found" });
+      return res.status(404).json({ error: "contract not found" });
+    }
+
+    const allowed = await getCancelStatus(party, contract);
+
+    if (allowed[party] == false) {
+      return res
+        .status(400)
+        .json({ error: "contract cannot be canceled at this time" });
     }
 
     if (

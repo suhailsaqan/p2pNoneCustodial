@@ -36,8 +36,7 @@ const Wrapper = styled.div`
 class Party extends React.Component {
   componentDidMount() {
     this.props.fetchContract(this.props.id);
-    this.props.fetchStatus(this.props.id, 1);
-    this.props.fetchStatus(this.props.id, 2);
+    this.props.fetchStatus(this.props.id, this.props.party);
   }
 
   componentDidUpdate(prevProps) {
