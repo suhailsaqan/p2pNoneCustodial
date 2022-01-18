@@ -1,10 +1,12 @@
-import { connect } from "react-redux";
-import { compose } from "redux";
-import Header from "./Component";
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import withAuth from '../../util/withAuth';
+import { logout } from '../../actions/auth';
+import Header from './Component';
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = { logout };
 
-const enhance = compose(connect(null, mapDispatchToProps));
+const enhance = compose(withAuth, connect(null, mapDispatchToProps));
 
 const HeaderContainer = enhance(Header);
 

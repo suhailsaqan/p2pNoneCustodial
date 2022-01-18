@@ -20,6 +20,13 @@ import {
   FETCH_CANCEL_STATUS_SUCCESS,
   FETCH_CANCEL_STATUS_ERROR,
 } from "../actions/contracts";
+import {
+  LOGIN_ERROR,
+  LOGIN_SUCCESS,
+  SIGNUP_ERROR,
+  SIGNUP_SUCCESS,
+  LOGOUT,
+} from "../actions/auth";
 import { hideErrorClearTimeout, showErrorWithTimeout } from "../actions/error";
 
 export default (store) => (next) => (action) => {
@@ -35,6 +42,9 @@ export default (store) => (next) => (action) => {
     case SET_MESSAGES_SUCCESS:
     case FETCH_SETTLE_STATUS_SUCCESS:
     case FETCH_CANCEL_STATUS_SUCCESS:
+    case LOGIN_SUCCESS:
+    case SIGNUP_SUCCESS:
+    case LOGOUT:
       if (store.getState().error) store.dispatch(hideErrorClearTimeout());
       break;
 
@@ -48,6 +58,8 @@ export default (store) => (next) => (action) => {
     case SET_MESSAGES_ERROR:
     case FETCH_SETTLE_STATUS_ERROR:
     case FETCH_CANCEL_STATUS_ERROR:
+    case LOGIN_ERROR:
+    case SIGNUP_ERROR:
       store.dispatch(showErrorWithTimeout(action.error));
       break;
 

@@ -10,6 +10,11 @@ import {
   FETCH_SETTLE_STATUS_ERROR,
   FETCH_CANCEL_STATUS_ERROR,
 } from "../actions/contracts";
+import {
+  LOGIN_ERROR,
+  SIGNUP_ERROR,
+  CHANGE_PASSWORD_ERROR,
+} from "../actions/auth";
 import { HIDE_ERROR } from "../actions/error";
 
 const initialState = null;
@@ -26,6 +31,9 @@ export default (state = initialState, action) => {
     case SET_MESSAGES_ERROR:
     case FETCH_SETTLE_STATUS_ERROR:
     case FETCH_CANCEL_STATUS_ERROR:
+    case LOGIN_ERROR:
+    case SIGNUP_ERROR:
+    case CHANGE_PASSWORD_ERROR:
       return action.error;
 
     case HIDE_ERROR:

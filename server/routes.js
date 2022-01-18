@@ -1,4 +1,6 @@
 const contracts = require("./controllers/contracts");
+const users = require("./controllers/users");
+const { jwtAuth, contractAuth } = require("./auth");
 const router = require("express").Router();
 
 router.get("/", (req, res) => {
@@ -7,20 +9,27 @@ router.get("/", (req, res) => {
   });
 });
 
-router.get("/contract", contracts.getContracts);
-router.get("/contract/:id", contracts.getContract);
-router.post("/contract", contracts.createContract);
+// Authentication routers
+router.post("/login", users.validate(), users.login);
+router.post("/register", users.validate("register"), users.register);
+router.post("/forgotPassword", users.forgot);
+router.post("/updatepassword", users.updatepassword);
+router.post(
+  "/changepassword",
+  users.validate("changepassword"),
+  users.changePassword
+);
 
-router.get("/status/:id/:party", contracts.getStatus);
-
-router.post("/settle", contracts.settleContract);
-router.get("/settle/status/:id/:party", contracts.getSettleStatus);
-
-router.post("/cancel", contracts.cancelContract);
-router.get("/cancel/status/:id/:party", contracts.getCancelStatus);
-
-router.post("/invoice", contracts.addInvoice);
-
+// Contract routers
+router.get("/contract", jwtAuth, contracts.getContracts);
+router.get("/contract/:id", jwtAuth, contracts.getContract);
+router.post("/contract", jwtAuth, contracts.createContract);
+router.get("/status/:id/:party", jwtAuth, contracts.getStatus);
+router.post("/settle", jwtAuth, contracts.settleContract);
+router.get("/settle/status/:id/:party", jwtAuth, contracts.getSettleStatus);
+router.post("/cancel", jwtAuth, contracts.cancelContract);
+router.get("/cancel/status/:id/:party", jwtAuth, contracts.getCancelStatus);
+router.post("/invoice", jwtAuth, contracts.addInvoice);
 router.get("/t/:id/:party", contracts.t);
 
 // Test routers

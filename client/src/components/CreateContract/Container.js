@@ -20,6 +20,6 @@ const enhance = compose(
   connect(mapStateToProps, mapDispatchToProps)
 );
 
-const CreatePostFormContainer = enhance(CreateContractForm);
+const CreateContractFormContainer = enhance(CreateContractForm);
 
-export default CreatePostFormContainer;
+export default CreateContractFormContainer;

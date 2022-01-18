@@ -64,6 +64,29 @@ const methods = {
   },
 };
 
+export async function login(username, password) {
+  const json = await methods.post("login", { username, password });
+  return json.token;
+}
+
+export async function signup(username, password, email) {
+  const json = await methods.post("register", { username, password, email });
+  return json.token;
+}
+
+export async function changePassword(oldPwd, newPwd, token) {
+  const json = await methods.post(
+    "changepassword",
+    {
+      oldpassword: oldPwd,
+      newpassword: newPwd,
+    },
+    token
+  );
+
+  return json;
+}
+
 export async function getContract(id) {
   return await methods.get(`contract/${id}`);
 }
