@@ -87,39 +87,38 @@ export async function changePassword(oldPwd, newPwd, token) {
   return json;
 }
 
-export async function getContract(id) {
-  return await methods.get(`contract/${id}`);
+export async function getContract(id, token) {
+  return await methods.get(`contract/${id}`, token);
 }
 
-export async function getContracts() {
-  return await methods.get(`contract`);
+export async function getContracts(token) {
+  return await methods.get(`contract`, token);
 }
 
-export async function createContract(body) {
-  console.log(body);
-  return await methods.post(`contract`, body);
+export async function createContract(body, token) {
+  return await methods.post(`contract`, body, token);
 }
 
-export async function getStatus(id, party) {
-  return await methods.get(`status/${id}/${party}`);
+export async function getStatus(id, party, token) {
+  return await methods.get(`status/${id}/${party}`, token);
 }
 
-export async function settleContract(id, party) {
-  return await methods.post(`settle`, { id, party });
+export async function settleContract(id, party, token) {
+  return await methods.post(`settle`, { id, party }, token);
 }
 
-export async function cancelContract(id, party) {
-  return await methods.post(`cancel`, { id, party });
+export async function cancelContract(id, party, token) {
+  return await methods.post(`cancel`, { id, party }, token);
 }
 
-export async function addInvoice(id, party, invoice) {
-  return await methods.post(`invoice`, { id, party, invoice });
+export async function addInvoice(id, party, invoice, token) {
+  return await methods.post(`invoice`, { id, party, invoice }, token);
 }
 
-export async function getSettleStatus(id, party) {
-  return await methods.get(`settle/status/${id}/${party}`);
+export async function getSettleStatus(id, party, token) {
+  return await methods.get(`settle/status/${id}/${party}`, token);
 }
 
-export async function getCancelStatus(id, party) {
-  return await methods.get(`cancel/status/${id}/${party}`);
+export async function getCancelStatus(id, party, token) {
+  return await methods.get(`cancel/status/${id}/${party}`, token);
 }

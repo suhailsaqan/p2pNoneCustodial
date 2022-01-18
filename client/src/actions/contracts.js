@@ -31,10 +31,11 @@ const fetchContractSuccess = (contract) => ({
 });
 const fetchContractError = (error) => ({ type: FETCH_CONTRACT_ERROR, error });
 
-export const fetchContract = (id = "") => async (dispatch) => {
+export const fetchContract = (id = "") => async (dispatch, getState) => {
   dispatch(fetchContractRequest);
   try {
-    const contracts = await getContract(id);
+    const { token } = getState().auth;
+    const contracts = await getContract(id, token);
     dispatch(fetchContractSuccess(contracts));
   } catch (error) {
     dispatch(fetchContractError(error));
@@ -52,10 +53,11 @@ const fetchContractsSuccess = (contracts) => ({
 });
 const fetchContractsError = (error) => ({ type: FETCH_CONTRACT_ERROR, error });
 
-export const fetchContracts = () => async (dispatch) => {
+export const fetchContracts = () => async (dispatch, getState) => {
   dispatch(fetchContractsRequest);
   try {
-    const contracts = await getContracts();
+    const { token } = getState().auth;
+    const contracts = await getContracts(token);
     dispatch(fetchContractsSuccess(contracts));
   } catch (error) {
     dispatch(fetchContractsError(error));
@@ -79,7 +81,8 @@ export const attemptCreateContract = (contract) => async (
 ) => {
   dispatch(createContractRequest);
   try {
-    const newContract = await createContract(contract);
+    const { token } = getState().auth;
+    const newContract = await createContract(contract, token);
     dispatch(createContractSuccess(newContract));
   } catch (error) {
     dispatch(createContractError(error));
@@ -97,10 +100,11 @@ const fetchStatusSuccess = (status) => ({
 });
 const fetchStatusError = (error) => ({ type: FETCH_STATUS_ERROR, error });
 
-export const fetchStatus = (id, party) => async (dispatch) => {
+export const fetchStatus = (id, party) => async (dispatch, getState) => {
   dispatch(fetchStatusRequest);
   try {
-    const status = await getStatus(id, party);
+    const { token } = getState().auth;
+    const status = await getStatus(id, party, token);
     dispatch(fetchStatusSuccess(status));
   } catch (err) {
     dispatch(fetchStatusError(err));
@@ -124,7 +128,8 @@ export const attemptSettleContract = (id, party) => async (
 ) => {
   dispatch(settleContractRequest);
   try {
-    const contract = await settleContract(id, party);
+    const { token } = getState().auth;
+    const contract = await settleContract(id, party, token);
     dispatch(settleContractSuccess(contract));
   } catch (error) {
     dispatch(settleContractError(error));
@@ -142,12 +147,13 @@ const cancelContractSuccess = (contract) => ({
 });
 const cancelContractError = (error) => ({ type: CANCEL_CONTRACT_ERROR, error });
 
-export const attemptCancelContract = (id, party) => async (
+export const attemptCancelContract = (id, party, token) => async (
   dispatch,
   getState
 ) => {
   dispatch(cancelContractRequest);
   try {
+    const { token } = getState().auth;
     const contract = await cancelContract(id, party);
     dispatch(cancelContractSuccess(contract));
   } catch (error) {
@@ -172,7 +178,8 @@ export const attemptAddInvoice = (id, party, invoice) => async (
 ) => {
   dispatch(addInvoiceRequest);
   try {
-    const contract = await addInvoice(id, party, invoice);
+    const { token } = getState().auth;
+    const contract = await addInvoice(id, party, invoice, token);
     dispatch(addInvoiceSuccess(contract));
   } catch (error) {
     dispatch(addInvoiceError(error));
@@ -219,6 +226,7 @@ const setMessagesError = (error) => ({ type: SET_MESSAGES_ERROR, error });
 export const attemptSetMessages = (party) => async (dispatch, getState) => {
   dispatch(setMessagesRequest);
   try {
+    const { token } = getState().auth;
     var payment_not_received = false;
     var payment_received = false;
     var instructions = false;
@@ -472,10 +480,11 @@ const fetchSettleStatusError = (error) => ({
   error,
 });
 
-export const fetchSettleStatus = (id, party) => async (dispatch) => {
+export const fetchSettleStatus = (id, party) => async (dispatch, getState) => {
   dispatch(fetchSettleStatusRequest);
   try {
-    const status = await getSettleStatus(id, party);
+    const { token } = getState().auth;
+    const status = await getSettleStatus(id, party, token);
     dispatch(fetchSettleStatusSuccess(status));
   } catch (error) {
     dispatch(fetchSettleStatusError(error));
@@ -496,10 +505,11 @@ const fetchCancelStatusError = (error) => ({
   error,
 });
 
-export const fetchCancelStatus = (id, party) => async (dispatch) => {
+export const fetchCancelStatus = (id, party) => async (dispatch, getState) => {
   dispatch(fetchCancelStatusRequest);
   try {
-    const status = await getCancelStatus(id, party);
+    const { token } = getState().auth;
+    const status = await getCancelStatus(id, party, token);
     dispatch(fetchCancelStatusSuccess(status));
   } catch (error) {
     dispatch(fetchCancelStatusError(error));

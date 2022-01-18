@@ -12,6 +12,7 @@ import forgotPassword from "../forgotPassword/ForgotPassword";
 import UpdatePassword from "../updatePassword/UpdatePassword";
 import Settings from "../Settings/Component";
 import ChangePasswordContainer from "../ChangePasswordForm/Container";
+import CreateContractContainer from "../CreateContract/Container";
 import Home from "../Home";
 
 const App = (props) => (
@@ -32,6 +33,7 @@ const App = (props) => (
           />
           <Route path="/settings" component={Settings} />
           <Route path="/changepassword" component={ChangePasswordContainer} />
+          <Route path="/create" component={CreateContractContainer} />
           <Route path="/" component={Home} />
         </Switch>
       </>

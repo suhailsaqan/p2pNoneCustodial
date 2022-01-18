@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components/macro";
 import { Route } from "react-router-dom";
 import HomeMainSection from "./MainSection";
-import CreateContractContainer from "../CreateContract/Container";
 import OracleContainer from "../Oracle/Container";
 import PartyContainer from "../Party/Container";
 
@@ -24,19 +23,18 @@ const Wrapper = styled.div`
 const Home = () => (
   <Wrapper>
     <HomeMainSection>
-      <Route path="/" component={CreateContractContainer} />
-      <Route
-        exact
-        path="/party/:id/:party"
-        render={({ match }) => (
-          <PartyContainer id={match.params.id} party={match.params.party} />
-        )}
-      />
       <Route
         exact
         path="/oracle/:id"
         render={({ match, history }) => (
           <OracleContainer id={match.params.id} history={history} />
+        )}
+      />
+      <Route
+        exact
+        path="/party/:id/:party"
+        render={({ match }) => (
+          <PartyContainer id={match.params.id} party={match.params.party} />
         )}
       />
     </HomeMainSection>
