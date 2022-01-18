@@ -23,6 +23,17 @@ const Grid = styled.div`
   flex-direction: column;
 `;
 
+const TextPrimary = styled.h3`
+  font-size: 1rem;
+  color: ${(props) => props.theme.normalText};
+`;
+
+const TextSecondary = styled.p`
+  font-size: 0.8rem;
+  color: ${(props) => props.theme.mutedText};
+  text-transform: none;
+`;
+
 class Oracle extends React.Component {
   componentDidMount() {
     this.props.fetchContract(this.props.id);
@@ -65,13 +76,13 @@ class Oracle extends React.Component {
     if (!contract) return <Empty />;
     return (
       <Wrapper>
-        <p>ORACLE</p>
-        <p>{contract.description}</p>
+        <TextPrimary>ORACLE</TextPrimary>
+        <TextPrimary>{contract.description}</TextPrimary>
         <Grid>
-          <p>
+          <TextPrimary>
             <b>First Party</b>
-          </p>
-          <p>Current Status: {status_1}</p>
+          </TextPrimary>
+          <TextPrimary>Current Status: {status_1}</TextPrimary>
           <Link to={`/party/${contract._id}/1`}>Page</Link>
           <div>
             <SettleButtonContainer
@@ -89,10 +100,10 @@ class Oracle extends React.Component {
           </div>
         </Grid>
         <Grid>
-          <p>
+          <TextPrimary>
             <b>Second Party</b>
-          </p>
-          <p>Current Status: {status_2}</p>
+          </TextPrimary>
+          <TextPrimary>Current Status: {status_2}</TextPrimary>
           <Link to={`/party/${contract._id}/2`}>Page</Link>
           <div>
             <SettleButtonContainer

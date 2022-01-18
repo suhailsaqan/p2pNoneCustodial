@@ -1,14 +1,14 @@
-import styled from 'styled-components/macro';
-import { transition, wideFont } from './helpers';
+import styled from "styled-components/macro";
+import { transition, wideFont } from "./helpers";
 
 const Button = styled.button`
-  ${transition('filter', 'box-shadow')};
+  ${transition("filter", "box-shadow")};
   ${wideFont};
 
   border: none;
   border-radius: 10px;
   padding: 8px 24px;
-  background-color: ${props => props.theme.accent};
+  background-color: ${(props) => props.theme.accent};
   cursor: pointer;
   color: #ffffff;
   outline: none;
@@ -22,7 +22,7 @@ const Button = styled.button`
   }
 
   :focus {
-    box-shadow: 0 0 0 2px ${props => props.theme.accent + '4d'};
+    box-shadow: 0 0 0 2px ${(props) => props.theme.accent + "4d"};
   }
 `;
 

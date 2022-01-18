@@ -13,6 +13,8 @@ const dark = {
   activeBackground: "#333333",
   inputBackground: "#212121",
   shadow: "rgba(0, 0, 0, 0.4)",
+  settle: "#00FF00",
+  cancel: "#f5222d",
 };
 
 const light = {
@@ -26,6 +28,8 @@ const light = {
   activeBackground: "#fafafa",
   inputBackground: "#fcfcfc",
   shadow: "rgba(0, 0, 0, 0.05)",
+  settle: "#00FF00",
+  cancel: "#f5222d",
 };
 
 const theme = (isDark) => (isDark ? dark : light);
