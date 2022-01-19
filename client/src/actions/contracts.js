@@ -154,7 +154,7 @@ export const attemptCancelContract = (id, party, token) => async (
   dispatch(cancelContractRequest);
   try {
     const { token } = getState().auth;
-    const contract = await cancelContract(id, party);
+    const contract = await cancelContract(id, party, token);
     dispatch(cancelContractSuccess(contract));
   } catch (error) {
     dispatch(cancelContractError(error));
