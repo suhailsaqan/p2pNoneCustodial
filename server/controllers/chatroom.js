@@ -1,0 +1,133 @@
+const makeValidation = require("@withvoid/make-validation");
+const ChatRoomModel = require("../models/chatroom");
+const ChatMessageModel = require("../models/chat_message");
+const User = require("../models/user");
+
+checkUserInChatroom = async (chatroomId, userId) => {
+  try {
+    const chatroom = await ChatRoomModel.getChatRoomByRoomId(chatroomId);
+    return chatroom.userIds.includes(userId);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.initiateChat = async (req, res, next) => {
+  try {
+    const validation = makeValidation((types) => ({
+      payload: req.body,
+      checks: {
+        users: {
+          type: types.array,
+          options: { unique: true, empty: false, stringOnly: false },
+        },
+        type: { type: types.enum, options: { enum: CHAT_ROOM_TYPES } },
+      },
+    }));
+    if (!validation.success) res.json({ ...validation });
+
+    const { users, type } = req.body;
+    const allUsers = [...users];
+    const chatRoom = await ChatRoomModel.initiateChat(allUsers, type);
+    res.status(200).json(chatRoom);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postMessage = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+    const validation = makeValidation((types) => ({
+      payload: req.body,
+      checks: {
+        messageText: { type: types.string },
+      },
+    }));
+    if (!validation.success) res.json({ ...validation });
+
+    const messagePayload = {
+      messageText: req.body.messageText,
+    };
+    const currentLoggedUser = req.user.id;
+    const post = await ChatMessageModel.createPostInChatRoom(
+      roomId,
+      messagePayload,
+      currentLoggedUser
+    );
+    global.io.sockets.in(roomId).emit("new message", { message: post });
+    res.status(200).json(post);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getMessagesByRoomId = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+    const currentLoggedUser = req.user.id;
+
+    if (!checkUserInChatroom(roomId, currentLoggedUser)) {
+      res.json({ message: "user unauthorized to access chatroom" });
+    }
+
+    const options = {
+      page: parseInt(req.query.page) || 0,
+      limit: parseInt(req.query.limit) || 15,
+    };
+
+    const recentConversation = await ChatMessageModel.getConversationByRoomId(
+      roomId,
+      options
+    );
+    res.status(200).json(recentConversation);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.markConversationReadByRoomId = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+    const room = await ChatRoomModel.getChatRoomByRoomId(roomId);
+    if (!room) {
+      res.json({ message: "No room exists for this id" });
+    }
+
+    const currentLoggedUser = req.user.id;
+    const result = await ChatMessageModel.markMessageRead(
+      roomId,
+      currentLoggedUser
+    );
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteRoomById = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const room = await ChatRoomModel.remove({ _id: roomId });
+    const messages = await ChatMessageModel.remove({ chatRoomId: roomId });
+    res.status(200).json({
+      message: "Operation performed succesfully",
+      deletedRoomsCount: room.deletedCount,
+      deletedMessagesCount: messages.deletedCount,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteMessageById = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const message = await ChatMessageModel.remove({ _id: messageId });
+    res.status(200).json({
+      deletedMessagesCount: message.deletedCount,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

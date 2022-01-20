@@ -339,7 +339,7 @@ exports.getSettleStatus = async (req, res, next) => {
     return next(err);
   }
 };
-
+ 
 exports.settleContract = async (req, res, next) => {
   try {
     // TODO: check the status of the contract to be able to settle it

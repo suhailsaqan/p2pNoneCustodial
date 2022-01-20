@@ -8,12 +8,21 @@ import contracts from "./reducers/contracts";
 import errorMiddleware from "./middleware/error";
 import authMiddleware from "./middleware/auth";
 import themeMiddleware from "./middleware/theme";
+// import socketMiddleware from "./middleware/socket";
+// import chatMiddleware from "./middleware/chat";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default createStore(
   combineReducers({ form, contracts, error, auth, theme }),
   composeEnhancers(
-    applyMiddleware(thunk, authMiddleware, errorMiddleware, themeMiddleware)
+    applyMiddleware(
+      thunk,
+      authMiddleware,
+      errorMiddleware,
+      themeMiddleware
+      // socketMiddleware,
+      // chatMiddleware
+    )
   )
 );

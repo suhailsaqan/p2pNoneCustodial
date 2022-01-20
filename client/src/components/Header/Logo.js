@@ -12,14 +12,12 @@ const Logo = styled(Link)`
   color: ${(props) => props.theme.normalText};
   text-decoration: none;
 
-  @media (max-width: 425px) {
-    padding: 0 8px 0 16px;
+  @media (max-width: 768px) {
     font-size: 19px;
+    display: flex;
   }
 `;
 
-const HeaderLogo = () => (
-  <Logo to="/create">Non-custodial Peer to Peer Trading ☁️ ⚡😶‍🌫️</Logo>
-);
+const HeaderLogo = () => <Logo to="/create">Non</Logo>;
 
 export default HeaderLogo;

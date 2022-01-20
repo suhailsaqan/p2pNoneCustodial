@@ -1,4 +1,4 @@
-const app = require("./app");
+const server = require("./app");
 const mongoose = require("mongoose");
 const config = require("./config");
 
@@ -7,7 +7,6 @@ const connect = (url) => {
 };
 
 if (require.main === module) {
-  app.listen(config.port);
   connect(config.db.test);
   mongoose.connection.on("error", console.log);
 }

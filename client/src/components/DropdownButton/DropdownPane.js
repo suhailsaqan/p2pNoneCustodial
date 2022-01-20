@@ -1,22 +1,26 @@
-import React from 'react';
-import styled from 'styled-components/macro';
-import HeaderNavLink from '../Header/NavLink';
+import React from "react";
+import styled from "styled-components/macro";
+import HeaderNavLink from "../Header/NavLink";
 
 const DDPane = styled.div`
   position: absolute;
 	top: 3rem;
   left: -0.05rem;
   width: 250px;
-	border: 1px solid ${props => props.theme.foreground};
-	box-shadow: 0 4px 12px ${props => props.theme.shadow};
+	border: 1px solid ${(props) => props.theme.foreground};
+	box-shadow: 0 4px 12px ${(props) => props.theme.shadow};
 	min-height: 100px;
   visibility: hidden;
   opacity: 0;
-	background: ${props => props.theme.activeBackground};
+	background: ${(props) => props.theme.activeBackground};
 	transition .3s visibility, opacity .3s linear;
 	@media(max-width: 425px) {
 		top: 2.5rem;
 	}
+  @media (max-width: 768px) {
+    padding-right: 0.5rem;
+    max-width: fit-content;
+  }
 `;
 
 const DDPaneLink = styled(HeaderNavLink)`
@@ -25,11 +29,11 @@ const DDPaneLink = styled(HeaderNavLink)`
 
 const DropdownPane = ({ options }) => {
   if (!options) {
-    throw new Error('Dropdown options not provided: <DropdownPane/>');
+    throw new Error("Dropdown options not provided: <DropdownPane/>");
   }
 
   return (
-    <DDPane className='DDPane'>
+    <DDPane className="DDPane">
       {Object.entries(options).map(([name, route]) => (
         <DDPaneLink key={name} to={route}>
           {name}
