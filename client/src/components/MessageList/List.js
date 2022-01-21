@@ -13,7 +13,7 @@ const mapMessages = (messages) =>
   ));
 
 const sortMessages = (messages) =>
-  messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
 const MessagesList = ({ messages }) =>
   messages && <List>{mapMessages(sortMessages(messages))}</List>;
