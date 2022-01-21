@@ -33,7 +33,7 @@ router.get("/t/:id/:party", contracts.t);
 
 // Chatroom routers
 router.get("/chatroom/:roomId", jwtAuth, chatroom.getMessagesByRoomId);
-router.post("/chatroom/initiate", chatroom.initiateChat);
+// router.post("/chatroom/initiate", chatroom.initiateChat);
 router.post("/chatroom/message", jwtAuth, chatroom.postMessage);
 router.put(
   "/chatroom/:roomId/mark-read",

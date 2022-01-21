@@ -67,7 +67,7 @@ chatMessageSchema.statics.createPostInChatRoom = async function (
       // get me a user whose _id = userId
       {
         $lookup: {
-          from: "users",
+          from: "User",
           localField: "userId",
           foreignField: "_id",
           as: "userId",
@@ -78,7 +78,7 @@ chatMessageSchema.statics.createPostInChatRoom = async function (
       // get me a chatroom whose _id = chatRoomId
       {
         $lookup: {
-          from: "chatrooms",
+          from: "ChatRoom",
           localField: "chatRoomId",
           foreignField: "_id",
           as: "chatRoomInfo",
@@ -90,7 +90,7 @@ chatMessageSchema.statics.createPostInChatRoom = async function (
       // get me a user whose _id = userIds
       {
         $lookup: {
-          from: "users",
+          from: "User",
           localField: "chatRoomInfo.userIds",
           foreignField: "_id",
           as: "chatRoomInfo.userProfile",
@@ -113,8 +113,8 @@ chatMessageSchema.statics.createPostInChatRoom = async function (
         },
       },
     ]);
-    // return aggregate[0];
-    return post;
+    return aggregate;
+    // return post;
   } catch (error) {
     throw error;
   }

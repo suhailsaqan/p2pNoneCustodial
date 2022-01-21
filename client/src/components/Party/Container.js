@@ -5,6 +5,7 @@ import {
   fetchStatus,
   attemptAddInvoice,
   attemptSetMessages,
+  setStatus,
 } from "../../actions/contracts";
 import Party from "./Component";
 
@@ -37,6 +38,7 @@ const mapDispatchToProps = {
   fetchStatus,
   attemptAddInvoice,
   attemptSetMessages,
+  setStatus,
 };
 
 const enhance = compose(connect(mapStateToProps, mapDispatchToProps));

@@ -7,6 +7,7 @@ import InvoiceFormContainer from "./InvoiceForm/Container";
 import ChatroomContainer from "../Chatroom/Container";
 import contracts from "../../reducers/contracts";
 import { smallFont } from "../shared/helpers";
+import { socket } from "../../util/api";
 var QRCode = require("qrcode.react");
 
 const Par = styled.div`
@@ -38,6 +39,26 @@ class Party extends React.Component {
   componentDidMount() {
     this.props.fetchContract(this.props.id);
     this.props.fetchStatus(this.props.id, this.props.party);
+    this.socket();
+  }
+
+  socket() {
+    socket.emit("join", this.props.id);
+    // receive message
+    socket.on("new_status", (status) => {
+      console.log("new_status", status);
+      this.props.setStatus(status);
+    });
+
+    // send leave message when user leaves the page
+    window.addEventListener("beforeunload", (ev) => {
+      console.log("closing");
+      ev.preventDefault();
+
+      socket.emit("leave channel", {
+        user: this.props.currentUser.id,
+      });
+    });
   }
 
   componentDidUpdate(prevProps) {

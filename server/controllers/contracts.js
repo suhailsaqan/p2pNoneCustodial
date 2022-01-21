@@ -51,10 +51,11 @@ exports.createContract = async (req, res, next) => {
   try {
     const user = req.user;
     console.log(user);
-    const allUsers = [...user.id];
+    const allUsers = [user];
+    console.log(allUsers);
     const chatRoom = await ChatRoomModel.initiateChat(allUsers);
-    console.log(chatRoom);
-    const chatroom_id = chatRoom.chatRoomId;
+
+    const chatroom_id = chatRoom._id;
 
     const {
       contract_name,
@@ -77,6 +78,14 @@ exports.createContract = async (req, res, next) => {
       oracle_fee,
       chatroom_id,
     });
+
+    const newStatus = await getBothStatus(0, contract);
+    const eventEmitter = req.app.get("eventEmitter");
+    eventEmitter.emit("new_status", {
+      contractId: contract.id,
+      status: newStatus,
+    });
+
     res.status(201).json(contract);
   } catch (err) {
     next(err);
@@ -84,6 +93,7 @@ exports.createContract = async (req, res, next) => {
 };
 
 async function getStatus(party, contract) {
+  console.log("contract", contract);
   if (parseInt(party) == 1 && contract.first_party_original == undefined) {
     if (contract.second_party_original == undefined) {
       if (contract.second_party_amount > 0) {
@@ -208,6 +218,15 @@ async function getStatus(party, contract) {
   }
 }
 
+async function getBothStatus(party, contract) {
+  let ret = {};
+  if (parseInt(party) == 0) {
+    ret[1] = await getStatus(1, contract);
+    ret[2] = await getStatus(2, contract);
+  }
+  return ret;
+}
+
 exports.getStatus = async (req, res, next) => {
   try {
     let ret = {};
@@ -221,7 +240,7 @@ exports.getStatus = async (req, res, next) => {
     ) {
       return res
         .status(404)
-        .json({ error: "party can only be 1, 2 or 0 (for both parties)" });
+        .json({ message: "party can only be 1, 2 or 0 (for both parties)" });
     }
 
     const contract = await Contract.findById(id);
@@ -336,8 +355,8 @@ exports.getSettleStatus = async (req, res, next) => {
       parseInt(party) !== 0
     ) {
       return res
-        .status(404)
-        .json({ error: "party can only be 1, 2 or 0 (for both parties)" });
+        .status(400)
+        .json({ message: "party can only be 1, 2 or 0 (for both parties)" });
     }
 
     const settleState = await getSettleStatus(party, contract);
@@ -356,7 +375,7 @@ exports.settleContract = async (req, res, next) => {
 
     const contract = await Contract.findById(id);
     if (contract == null) {
-      return res.status(404).json({ error: "contract not found" });
+      return res.status(400).json({ message: "contract not found" });
     }
 
     const allowed = await getSettleStatus(party, contract);
@@ -364,7 +383,7 @@ exports.settleContract = async (req, res, next) => {
     if (allowed[party] == false) {
       return res
         .status(400)
-        .json({ error: "contract cannot be settled at this time" });
+        .json({ message: "contract cannot be settled at this time" });
     }
 
     if (parseInt(party) == 1) {
@@ -382,11 +401,18 @@ exports.settleContract = async (req, res, next) => {
 
           await settleHoldInvoice(payment_preimage);
 
+          const newStatus = await getBothStatus(0, contract);
+          const eventEmitter = req.app.get("eventEmitter");
+          eventEmitter.emit("new_status", {
+            contractId: id,
+            status: newStatus,
+          });
+
           return res.status(201).json(contract);
         }
-        // res.status(400).json({ error: "paid.is_confirmed" });
+        // res.status(400).json({ message: "paid.is_confirmed" });
       } else {
-        res.status(400).json({ error: "!invoiceDetails.is_canceled" });
+        res.status(400).json({ message: "!invoiceDetails.is_canceled" });
       }
     } else if (parseInt(party) == 2) {
       pmthash = contract.second_party_pmthash;
@@ -400,6 +426,13 @@ exports.settleContract = async (req, res, next) => {
           payment_preimage = paid.secret;
 
           await settleHoldInvoice(payment_preimage);
+
+          const newStatus = await getBothStatus(0, contract);
+          const eventEmitter = req.app.get("eventEmitter");
+          eventEmitter.emit("new_status", {
+            contractId: id,
+            status: newStatus,
+          });
 
           return res.status(201).json(contract);
         }
@@ -464,7 +497,7 @@ exports.getCancelStatus = async (req, res, next) => {
 
     const contract = await Contract.findById(id);
     if (contract == null) {
-      return res.status(404).json({ error: "contract not found" });
+      return res.status(400).json({ message: "contract not found" });
     }
 
     const allowed = await getCancelStatus(party, contract);
@@ -472,7 +505,7 @@ exports.getCancelStatus = async (req, res, next) => {
     if (allowed[party] == false) {
       return res
         .status(400)
-        .json({ error: "contract cannot be canceled at this time" });
+        .json({ message: "contract cannot be canceled at this time" });
     }
 
     if (
@@ -486,6 +519,14 @@ exports.getCancelStatus = async (req, res, next) => {
     }
 
     const cancelState = await getCancelStatus(party, contract);
+
+    const newStatus = await getBothStatus(0, contract);
+    const eventEmitter = req.app.get("eventEmitter");
+    eventEmitter.emit("new_status", {
+      contractId: id,
+      status: newStatus,
+    });
+
     return res.status(201).json(cancelState);
   } catch (err) {
     if (err.name === "CastError")
@@ -512,6 +553,14 @@ exports.cancelContract = async (req, res, next) => {
       return res.status(400).json({ message: "party can only be 1 or 2" });
     }
     await cancelHoldInvoice(pmthash);
+
+    const newStatus = await getBothStatus(0, contract);
+    const eventEmitter = req.app.get("eventEmitter");
+    eventEmitter.emit("new_status", {
+      contractId: id,
+      status: newStatus,
+    });
+
     return res.status(201).json(contract);
   } catch (err) {
     if (err.name === "CastError")
@@ -562,7 +611,17 @@ exports.addInvoice = async (req, res, next) => {
 
         contract.first_party_hodl = first_party_hodl;
 
-        contract.save();
+        await contract.save();
+
+        // im not sure if saving it returns the new contract object or not, so i will re 'find' it
+        const newContract = await Contract.findById(id);
+        const newStatus = await getBothStatus(0, newContract);
+        console.log("newStatus", newStatus);
+        const eventEmitter = req.app.get("eventEmitter");
+        eventEmitter.emit("new_status", {
+          contractId: id,
+          status: newStatus,
+        });
 
         res.status(201).json(contract);
       }
@@ -587,7 +646,17 @@ exports.addInvoice = async (req, res, next) => {
 
         contract.second_party_hodl = second_party_hodl;
 
-        contract.save();
+        await contract.save();
+
+        // im not sure if saving it returns the new contract object or not, so i will re 'find' it
+        const newContract = await Contract.findById(id);
+        const newStatus = await getBothStatus(0, newContract);
+        console.log("newStatus", newStatus);
+        const eventEmitter = req.app.get("eventEmitter");
+        eventEmitter.emit("new_status", {
+          contractId: id,
+          status: newStatus,
+        });
 
         res.status(201).json(contract);
       }

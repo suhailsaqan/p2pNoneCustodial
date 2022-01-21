@@ -39,24 +39,22 @@ exports.postMessage = async (req, res, next) => {
   try {
     let { roomId, message } = req.body;
     message = message.message;
-    // const validation = makeValidation((types) => ({
-    //   payload: req.body,
-    //   checks: {
-    //     messageText: { type: types.string },
-    //   },
-    // }));
-    // if (!validation.success) res.json({ ...validation });
+    const validation = makeValidation((types) => ({
+      payload: { roomId, message },
+      checks: {
+        message: { type: types.string },
+      },
+    }));
+    if (!validation.success) return res.status(400).json({ ...validation });
 
-    // const messagePayload = {
-    //   messageText: message,
-    // };
     const currentLoggedUser = req.user.id;
-    console.log(roomId, message, currentLoggedUser);
+    // console.log(roomId, message, currentLoggedUser);
     const newMessage = await ChatMessageModel.createPostInChatRoom(
       roomId,
       message,
       currentLoggedUser
     );
+    console.log(newMessage);
     const eventEmitter = req.app.get("eventEmitter");
     eventEmitter.emit("new_message", { roomId: roomId, message: newMessage });
     res.status(200).json(newMessage);
@@ -68,12 +66,14 @@ exports.postMessage = async (req, res, next) => {
 exports.getMessagesByRoomId = async (req, res, next) => {
   try {
     const { roomId } = req.params;
-    console.log(req.user);
-    const currentLoggedUser = req.user._id;
+    const currentLoggedUser = req.user.id;
 
-    // if (!checkUserInChatroom(roomId, currentLoggedUser)) {
-    //   res.json({ message: "user unauthorized to access chatroom" });
-    // }
+    if (!(await checkUserInChatroom(roomId, currentLoggedUser))) {
+      console.log("user not in chatroom");
+      return res
+        .status(400)
+        .json({ message: "user unauthorized to access chatroom" });
+    }
 
     const options = {
       page: parseInt(req.query.page) || 0,

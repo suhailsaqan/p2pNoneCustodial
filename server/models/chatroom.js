@@ -46,29 +46,14 @@ chatRoomSchema.statics.getChatRoomByRoomId = async function (roomId) {
 /**
  * @param {Array} userIds - array of strings of userIds
  */
-chatRoomSchema.statics.initiateChat = async function (users) {
+chatRoomSchema.statics.initiateChat = async function (allUsers) {
   try {
-    // const availableRoom = await this.findOne({
-    //   userIds: {
-    //     $size: userIds.length,
-    //     $all: [...userIds]
-    //   },
-    //   type
-    // });
-    // if (availableRoom) {
-    //   return {
-    //     isNew: false,
-    //     message: 'retrieving an old chat room',
-    //     chatRoomId: availableRoom._doc._id,
-    //     type: availableRoom._doc.type
-    //   };
-    // }
-
-    const newRoom = await this.create({ users });
-    return {
-      message: "creating a new chatroom",
-      chatRoomId: newRoom._doc._id,
-    };
+    let users = [];
+    for (index in allUsers) {
+      users.push(allUsers[index].id);
+    }
+    const newRoom = await this.create({ userIds: users });
+    return newRoom;
   } catch (error) {
     console.log("error on start chat method", error);
     throw error;

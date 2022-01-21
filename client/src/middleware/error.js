@@ -19,6 +19,7 @@ import {
   FETCH_SETTLE_STATUS_ERROR,
   FETCH_CANCEL_STATUS_SUCCESS,
   FETCH_CANCEL_STATUS_ERROR,
+  SET_STATUS,
 } from "../actions/contracts";
 import {
   FETCH_CHATROOM_SUCCESS,
@@ -51,6 +52,7 @@ export default (store) => (next) => (action) => {
     case SET_MESSAGES_SUCCESS:
     case FETCH_SETTLE_STATUS_SUCCESS:
     case FETCH_CANCEL_STATUS_SUCCESS:
+    case SET_STATUS:
     case LOGIN_SUCCESS:
     case SIGNUP_SUCCESS:
     case LOGOUT:

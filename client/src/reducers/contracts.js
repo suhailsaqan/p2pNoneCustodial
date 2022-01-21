@@ -29,6 +29,7 @@ import {
   FETCH_CANCEL_STATUS_REQUEST,
   FETCH_CANCEL_STATUS_SUCCESS,
   FETCH_CANCEL_STATUS_ERROR,
+  SET_STATUS,
 } from "../actions/contracts";
 
 const initialState = { isFetching: false, items: [] };
@@ -139,6 +140,14 @@ export default (state = initialState, action) => {
       };
     case FETCH_CANCEL_STATUS_ERROR:
       return { ...state, isFetching: false };
+
+    case SET_STATUS:
+      return {
+        ...state,
+        isFetching: false,
+        status_1: action.status["1"],
+        status_2: action.status["2"],
+      };
 
     default:
       return state;

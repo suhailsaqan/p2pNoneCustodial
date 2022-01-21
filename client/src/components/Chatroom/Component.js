@@ -65,6 +65,7 @@ class Chatroom extends React.Component {
 
     // send leave message when user leaves the page
     window.addEventListener("beforeunload", (ev) => {
+      console.log("closing");
       ev.preventDefault();
 
       socket.emit("leave channel", {

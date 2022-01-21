@@ -507,3 +507,11 @@ export const fetchCancelStatus = (id, party) => async (dispatch, getState) => {
     dispatch(fetchCancelStatusError(error));
   }
 };
+
+export const SET_STATUS = "SET_STATUS";
+
+const setStatusSuccess = (status) => ({ type: SET_STATUS, status });
+
+export const setStatus = (status) => (dispatch) => {
+  dispatch(setStatusSuccess(status));
+};

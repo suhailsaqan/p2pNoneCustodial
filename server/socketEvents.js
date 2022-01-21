@@ -1,6 +1,7 @@
 exports = module.exports = function (io) {
   io.on("connection", function (socket) {
     socket.on("leave channel", function (channel) {
+      console.log("leave channel", channel);
       socket.leave(channel);
     });
     socket.on("join", function (chatroom_id) {
