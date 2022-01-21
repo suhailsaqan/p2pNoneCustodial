@@ -8,11 +8,13 @@ const Wrapper = styled.aside`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  max-height: 50%;
+  width: 50%;
   border: 1px solid ${(props) => props.theme.border};
   border-radius: 20px;
   background-color: ${(props) => props.theme.foreground};
   overflow-y: scroll;
+  flex-direction: column;
 
   ::-webkit-scrollbar {
     width: 10px;
@@ -43,34 +45,21 @@ const Wrapper = styled.aside`
 
 class Chatroom extends React.Component {
   componentDidMount() {
-    console.log("wqdwqdqwdwqd", this.props.contract);
     this.props.fetchChatroom(this.props.contract.chatroom_id);
     this.socket();
     console.log("these are the messages", this.props.chatroom);
   }
 
   socket() {
-    // // receive userlist
-    // socket.on('chat users', msg => {
-    //   this.props.dispatch(receiveUsers(msg));
-    // });
-
-    // // send join message
-    // socket.emit('chat join', {
-    //   timestamp: new Date(),
-    //   sender: username,
-    //   message: 'joined'
-    // });
-
-    // // receive join message
-    // socket.on('chat join', msg => {
-    //   this.props.dispatch(receiveMessage(msg));
-    // });
-
+    socket.emit("join", this.props.contract.chatroom_id);
     // receive message
-    console.log("this is the socket", socket);
     socket.on("new_message", (msg) => {
-      console.log("new_message", msg);
+      console.log(
+        "new_message",
+        msg,
+        "this is the chatroom",
+        this.props.chatroom
+      );
       this.props.addMessage(msg);
     });
 

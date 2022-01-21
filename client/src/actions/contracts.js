@@ -241,14 +241,6 @@ export const attemptSetMessages = (party) => async (dispatch, getState) => {
     var payment_not_sent = false;
     var instructions_invoiced = false;
 
-    console.log(
-      "actions:",
-      party,
-      //   getState().contracts.contract,
-      getState().contracts.status_1,
-      getState().contracts.status_2
-    );
-
     if (parseInt(party) == 1) {
       if (getState().contracts.status_1 == STATUS_TYPES.CONTRACT_CANCELED) {
         payment_not_received = true;

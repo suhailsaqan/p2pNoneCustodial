@@ -47,18 +47,18 @@ exports.postMessage = async (req, res, next) => {
     // }));
     // if (!validation.success) res.json({ ...validation });
 
-    const messagePayload = {
-      messageText: message,
-    };
+    // const messagePayload = {
+    //   messageText: message,
+    // };
     const currentLoggedUser = req.user.id;
     console.log(roomId, message, currentLoggedUser);
     const newMessage = await ChatMessageModel.createPostInChatRoom(
       roomId,
-      messagePayload,
+      message,
       currentLoggedUser
     );
     const eventEmitter = req.app.get("eventEmitter");
-    eventEmitter.emit("new_message", newMessage);
+    eventEmitter.emit("new_message", { roomId: roomId, message: newMessage });
     res.status(200).json(newMessage);
   } catch (err) {
     next(err);

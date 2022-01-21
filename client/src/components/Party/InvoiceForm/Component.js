@@ -6,7 +6,6 @@ import SubmitButton from "../../shared/form/SubmitButton";
 
 class InvoiceForm extends React.Component {
   addInvoice = (invoice) => {
-    console.log(this.props.contract._id, this.props.party, invoice);
     this.props.attemptAddInvoice(
       this.props.contract._id,
       this.props.party,

@@ -1,16 +1,11 @@
 exports = module.exports = function (io) {
   io.on("connection", function (socket) {
-    console.log("a user connected");
-    socket.join("Lobby");
-    socket.on("chat mounted", function (user) {
-      // TODO: Does the server need to know the user?
-      socket.emit("receive socket", socket.id);
-    });
     socket.on("leave channel", function (channel) {
       socket.leave(channel);
     });
-    socket.on("join channel", function (channel) {
-      socket.join(channel.name);
+    socket.on("join", function (chatroom_id) {
+      console.log("joining this room", chatroom_id);
+      socket.join(chatroom_id);
     });
     socket.on("new message", function (msg) {
       socket.broadcast.to(msg.channelID).emit("new bc message", msg);

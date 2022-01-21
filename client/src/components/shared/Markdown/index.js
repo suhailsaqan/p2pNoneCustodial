@@ -1,11 +1,11 @@
-import React from 'react';
-import styled from 'styled-components/macro';
-import ReactMarkdown from 'react-markdown';
-import breaks from 'remark-breaks';
-import renderers from './renderers';
+import React from "react";
+import styled from "styled-components/macro";
+import ReactMarkdown from "react-markdown";
+import breaks from "remark-breaks";
+import renderers from "./renderers";
 
 const StyledReactMarkdown = styled(ReactMarkdown)`
-  color: ${props => props.theme.normalText};
+  color: ${(props) => props.theme.normalText};
   font-size: 15px;
   line-height: 1.5;
 
@@ -34,34 +34,36 @@ const StyledReactMarkdown = styled(ReactMarkdown)`
 `;
 
 const allowed = [
-  'text',
-  'paragraph',
-  'emphasis',
-  'strong',
-  'delete',
-  'heading',
-  'link',
-  'code',
-  'table',
-  'tableHead',
-  'tableBody',
-  'tableRow',
-  'tableCell',
-  'html',
-  'thematicBreak',
-  'list',
-  'listItem',
-  'inlineCode'
+  "text",
+  "paragraph",
+  "emphasis",
+  "strong",
+  "delete",
+  "heading",
+  "link",
+  "code",
+  "table",
+  "tableHead",
+  "tableBody",
+  "tableRow",
+  "tableCell",
+  "html",
+  "thematicBreak",
+  "list",
+  "listItem",
+  "inlineCode",
 ];
 
-const Markdown = props => (
+const Markdown = (props) => (
   <StyledReactMarkdown
     source={props.children}
     plugins={[breaks]}
     allowedTypes={allowed}
     renderers={renderers}
     unwrapDisallowed
-  />
+  >
+    {props.children}
+  </StyledReactMarkdown>
 );
 
 export default Markdown;

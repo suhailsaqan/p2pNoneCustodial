@@ -62,16 +62,7 @@ class Oracle extends React.Component {
       settle_status_2,
       cancel_status_2,
     } = this.props;
-    console.log(
-      "status_1",
-      status_1,
-      "status_2",
-      status_2,
-      settle_status_1,
-      cancel_status_1,
-      settle_status_2,
-      cancel_status_2
-    );
+
     if (this.props.isFetching) return <LoadingIndicatorBox />;
     if (!contract) return <Empty />;
     return (

@@ -18,7 +18,6 @@ export default (state = initialState, action) => {
     case FETCH_CHATROOM_REQUEST:
       return { ...state, isFetching: true, chatroom: null };
     case FETCH_CHATROOM_SUCCESS:
-      console.log("**********", action.chatroom);
       return { ...state, isFetching: false, chatroom: action.chatroom };
     case FETCH_CHATROOM_ERROR:
       return { ...state, isFetching: false };

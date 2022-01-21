@@ -38,9 +38,9 @@ global.io = server.listen(config.port);
 
 const socketEvents = require("./socketEvents")(io);
 
-eventEmitter.on("new_message", (message) => {
+eventEmitter.on("new_message", (emit) => {
   console.log("going to emit new_message");
-  io.emit("new_message", message);
+  io.to(emit.roomId).emit("new_message", emit.message);
 });
 
 module.exports = { server };

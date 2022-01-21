@@ -38,12 +38,9 @@ class Party extends React.Component {
   componentDidMount() {
     this.props.fetchContract(this.props.id);
     this.props.fetchStatus(this.props.id, this.props.party);
-    console.log("wqdwqdwdw", this.props.contract);
-    // this.props.fetchChatroom(this.props.contract.description);
   }
 
   componentDidUpdate(prevProps) {
-    console.log(this.props.party);
     if (
       this.props.status_1 !== prevProps.status_1 ||
       this.props.status_2 !== prevProps.status_2
@@ -72,35 +69,16 @@ class Party extends React.Component {
       instructions_invoiced,
     } = this.props;
 
-    console.log(
-      contract,
-      payment_not_received,
-      payment_received,
-      instructions,
-      invoice_form,
-      completion_message,
-      instructions_awaiting_counterparty_invoice,
-      instructions_awaiting_counterparty_deposit,
-      invoice_container,
-      instructions_awaiting_settlement_invoice_submitted,
-      instructions_awaiting_settlement_invoice_paid,
-      payment_sent,
-      payment_not_sent,
-      instructions_invoiced
-    );
-
     if (this.props.isFetching) return <LoadingIndicatorBox />;
     if (!contract) return <Empty />;
 
     if (this.props.party == 1 && contract.second_party_hodl !== undefined) {
       var hodl_invoice = contract.second_party_hodl;
-      console.log("*****", hodl_invoice);
     } else if (
       this.props.party == 2 &&
       contract.first_party_hodl !== undefined
     ) {
       var hodl_invoice = contract.first_party_hodl;
-      console.log("*****", hodl_invoice);
     } else {
       var hodl_invoice = "";
     }

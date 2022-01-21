@@ -1,12 +1,12 @@
-import React from 'react';
-import styled from 'styled-components/macro';
-import Markdown from '../shared/Markdown';
+import React from "react";
+import styled from "styled-components/macro";
+import Markdown from "../shared/Markdown";
 
 const Content = styled.div`
   padding: 12px;
 `;
 
-const MessageContent = props => (
+const MessageContent = (props) => (
   <Content>
     <Markdown>{props.children}</Markdown>
   </Content>
