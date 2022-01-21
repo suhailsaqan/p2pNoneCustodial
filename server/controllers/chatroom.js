@@ -21,14 +21,14 @@ exports.initiateChat = async (req, res, next) => {
           type: types.array,
           options: { unique: true, empty: false, stringOnly: false },
         },
-        type: { type: types.enum, options: { enum: CHAT_ROOM_TYPES } },
+        // type: { type: types.enum, options: { enum: CHAT_ROOM_TYPES } },
       },
     }));
     if (!validation.success) res.json({ ...validation });
 
-    const { users, type } = req.body;
+    const { users } = req.body;
     const allUsers = [...users];
-    const chatRoom = await ChatRoomModel.initiateChat(allUsers, type);
+    const chatRoom = await ChatRoomModel.initiateChat(allUsers);
     res.status(200).json(chatRoom);
   } catch (err) {
     next(err);
@@ -37,26 +37,29 @@ exports.initiateChat = async (req, res, next) => {
 
 exports.postMessage = async (req, res, next) => {
   try {
-    const { roomId } = req.params;
-    const validation = makeValidation((types) => ({
-      payload: req.body,
-      checks: {
-        messageText: { type: types.string },
-      },
-    }));
-    if (!validation.success) res.json({ ...validation });
+    let { roomId, message } = req.body;
+    message = message.message;
+    // const validation = makeValidation((types) => ({
+    //   payload: req.body,
+    //   checks: {
+    //     messageText: { type: types.string },
+    //   },
+    // }));
+    // if (!validation.success) res.json({ ...validation });
 
     const messagePayload = {
-      messageText: req.body.messageText,
+      messageText: message,
     };
     const currentLoggedUser = req.user.id;
-    const post = await ChatMessageModel.createPostInChatRoom(
+    console.log(roomId, message, currentLoggedUser);
+    const newMessage = await ChatMessageModel.createPostInChatRoom(
       roomId,
       messagePayload,
       currentLoggedUser
     );
-    global.io.sockets.in(roomId).emit("new message", { message: post });
-    res.status(200).json(post);
+    const eventEmitter = req.app.get("eventEmitter");
+    eventEmitter.emit("new_message", newMessage);
+    res.status(200).json(newMessage);
   } catch (err) {
     next(err);
   }
@@ -65,11 +68,12 @@ exports.postMessage = async (req, res, next) => {
 exports.getMessagesByRoomId = async (req, res, next) => {
   try {
     const { roomId } = req.params;
-    const currentLoggedUser = req.user.id;
+    console.log(req.user);
+    const currentLoggedUser = req.user._id;
 
-    if (!checkUserInChatroom(roomId, currentLoggedUser)) {
-      res.json({ message: "user unauthorized to access chatroom" });
-    }
+    // if (!checkUserInChatroom(roomId, currentLoggedUser)) {
+    //   res.json({ message: "user unauthorized to access chatroom" });
+    // }
 
     const options = {
       page: parseInt(req.query.page) || 0,
@@ -80,6 +84,7 @@ exports.getMessagesByRoomId = async (req, res, next) => {
       roomId,
       options
     );
+    console.log("recentConversation", recentConversation);
     res.status(200).json(recentConversation);
   } catch (err) {
     next(err);

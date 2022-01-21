@@ -23,6 +23,7 @@ const contractSchema = new Schema({
   usdt_address: { type: Number, default: 0 },
   private: { type: Number, default: 0 },
   oracle_fee: { type: Number },
+  chatroom_id: { type: String },
 });
 
 const Contract = mongoose.model("Contract", contractSchema);

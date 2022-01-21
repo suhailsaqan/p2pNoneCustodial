@@ -1,17 +1,17 @@
-import React from 'react';
-import styled from 'styled-components/macro';
-import { socket } from '../../util/api';
-import MessageFormContainer from '../ChatroomForm/Container';
-import MessageListSection from '../MessageList';
+import React from "react";
+import styled from "styled-components/macro";
+import { socket } from "../../util/api";
+import MessageFormContainer from "../ChatroomForm/Container";
+import MessageListSection from "../MessageList";
 
 const Wrapper = styled.aside`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  border: 1px solid ${props => props.theme.border};
+  border: 1px solid ${(props) => props.theme.border};
   border-radius: 20px;
-  background-color: ${props => props.theme.foreground};
+  background-color: ${(props) => props.theme.foreground};
   overflow-y: scroll;
 
   ::-webkit-scrollbar {
@@ -43,9 +43,10 @@ const Wrapper = styled.aside`
 
 class Chatroom extends React.Component {
   componentDidMount() {
-    this.props.fetchChatroom(this.props.id);
-    this.props.fetchMessages(this.props.id); // add query params for pagination
+    console.log("wqdwqdqwdwqd", this.props.contract);
+    this.props.fetchChatroom(this.props.contract.chatroom_id);
     this.socket();
+    console.log("these are the messages", this.props.chatroom);
   }
 
   socket() {
@@ -66,32 +67,27 @@ class Chatroom extends React.Component {
     //   this.props.dispatch(receiveMessage(msg));
     // });
 
-    // // receive leave message
-    // socket.on('chat leave', msg => {
-    //   this.props.dispatch(receiveMessage(msg));
-    // });
-
     // receive message
-    socket.on('chat message', msg => {
-      this.props.receiveMessage(msg);
+    console.log("this is the socket", socket);
+    socket.on("new_message", (msg) => {
+      console.log("new_message", msg);
+      this.props.addMessage(msg);
     });
 
     // send leave message when user leaves the page
-    window.addEventListener('beforeunload', ev => {
+    window.addEventListener("beforeunload", (ev) => {
       ev.preventDefault();
 
-      // socket.emit('chat leave', {
-      //   timestamp: new Date(),
-      //   sender: username,
-      //   message: 'left'
-      // });
+      socket.emit("leave channel", {
+        user: this.props.currentUser.id,
+      });
     });
   }
 
   render() {
     return (
       <Wrapper>
-        <MessageListSection messages={this.state.messages} />
+        <MessageListSection messages={this.props.chatroom} />
         <MessageFormContainer />
       </Wrapper>
     );

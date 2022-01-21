@@ -7,6 +7,7 @@ const {
   sendPayment,
   decodePayReq,
 } = require("../lightning/invoices");
+const ChatRoomModel = require("../models/chatroom");
 
 const STATUS_TYPES = {
   CONTRACT_FUNDED_AWAITING_SETTLEMENT: "Contract funded, awaiting settlement",
@@ -48,6 +49,13 @@ exports.getContracts = async (req, res, next) => {
 
 exports.createContract = async (req, res, next) => {
   try {
+    const user = req.user;
+    console.log(user);
+    const allUsers = [...user.id];
+    const chatRoom = await ChatRoomModel.initiateChat(allUsers);
+    console.log(chatRoom);
+    const chatroom_id = chatRoom.chatRoomId;
+
     const {
       contract_name,
       description,
@@ -67,6 +75,7 @@ exports.createContract = async (req, res, next) => {
       first_party_amount,
       second_party_amount,
       oracle_fee,
+      chatroom_id,
     });
     res.status(201).json(contract);
   } catch (err) {
@@ -339,7 +348,7 @@ exports.getSettleStatus = async (req, res, next) => {
     return next(err);
   }
 };
- 
+
 exports.settleContract = async (req, res, next) => {
   try {
     // TODO: check the status of the contract to be able to settle it

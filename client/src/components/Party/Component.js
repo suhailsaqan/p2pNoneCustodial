@@ -4,6 +4,7 @@ import LoadingIndicatorBox from "../shared/LoadingIndicator/Box";
 import Empty from "../shared/Empty";
 import { Link } from "react-router-dom";
 import InvoiceFormContainer from "./InvoiceForm/Container";
+import ChatroomContainer from "../Chatroom/Container";
 import contracts from "../../reducers/contracts";
 import { smallFont } from "../shared/helpers";
 var QRCode = require("qrcode.react");
@@ -37,6 +38,8 @@ class Party extends React.Component {
   componentDidMount() {
     this.props.fetchContract(this.props.id);
     this.props.fetchStatus(this.props.id, this.props.party);
+    console.log("wqdwqdwdw", this.props.contract);
+    // this.props.fetchChatroom(this.props.contract.description);
   }
 
   componentDidUpdate(prevProps) {
@@ -164,6 +167,7 @@ class Party extends React.Component {
           </Par>
         )}
         {completion_message && <Par>This contract is complete 🎉</Par>}
+        <ChatroomContainer />
       </Wrapper>
     );
   }

@@ -1,22 +1,24 @@
-import { connect } from 'react-redux';
-import withAuth from '../../util/withAuth';
-import Chatroom from './Component';
+import { connect } from "react-redux";
+import withAuth from "../../util/withAuth";
+import Chatroom from "./Component";
 import {
-  receiveMessage,
+  addMessage,
   fetchMessages,
-  fetchChatroom
-} from '../../actions/chatroom';
+  fetchChatroom,
+} from "../../actions/chatroom";
 
-export const mapStateToProps = state => ({
+export const mapStateToProps = (state) => ({
+  contract: state.contracts.contract,
   messages: state.chatroom.messages,
   isFetching: state.chatroom.isFetching,
-  chatroom: state.chatroom.chatroom
+  chatroom: state.chatroom.chatroom,
+  currentUser: state.auth.currentUser,
 });
 
 const mapDispatchToProps = {
-  receiveMessage,
+  addMessage,
   fetchMessages,
-  fetchChatroom
+  fetchChatroom,
 };
 
 const ChatroomContainer = connect(

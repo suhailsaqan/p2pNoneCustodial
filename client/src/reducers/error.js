@@ -11,6 +11,11 @@ import {
   FETCH_CANCEL_STATUS_ERROR,
 } from "../actions/contracts";
 import {
+  FETCH_CHATROOM_ERROR,
+  FETCH_MESSAGES_ERROR,
+  CREATE_MESSAGE_ERROR,
+} from "../actions/chatroom";
+import {
   LOGIN_ERROR,
   SIGNUP_ERROR,
   CHANGE_PASSWORD_ERROR,
@@ -34,6 +39,9 @@ export default (state = initialState, action) => {
     case LOGIN_ERROR:
     case SIGNUP_ERROR:
     case CHANGE_PASSWORD_ERROR:
+    case FETCH_CHATROOM_ERROR:
+    case FETCH_MESSAGES_ERROR:
+    case CREATE_MESSAGE_ERROR:
       return action.error;
 
     case HIDE_ERROR:

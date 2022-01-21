@@ -1,3 +1,4 @@
+import { io } from "socket.io-client";
 const baseUrl = "http://localhost:9000";
 
 const methods = {
@@ -64,6 +65,16 @@ const methods = {
   },
 };
 
+export const socket = io(baseUrl, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Access-Control-Allow-Origin"],
+    credentials: true,
+  },
+  transports: ["websocket"],
+});
+
 export async function login(username, password) {
   const json = await methods.post("login", { username, password });
   return json.token;
@@ -121,4 +132,19 @@ export async function getSettleStatus(id, party, token) {
 
 export async function getCancelStatus(id, party, token) {
   return await methods.get(`cancel/status/${id}/${party}`, token);
+}
+
+export async function getChatroom(roomId, token) {
+  return await methods.get(`chatroom/${roomId}`, token);
+}
+
+export async function getMessages(roomId, query, token) {
+  return await methods.get(
+    `chatroom/${roomId}?page=${query.page}&limit=${query.limit}`,
+    token
+  );
+}
+
+export async function createMessage(roomId, message, token) {
+  return await methods.post(`chatroom/message`, { roomId, message }, token);
 }

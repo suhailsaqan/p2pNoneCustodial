@@ -21,6 +21,15 @@ import {
   FETCH_CANCEL_STATUS_ERROR,
 } from "../actions/contracts";
 import {
+  FETCH_CHATROOM_SUCCESS,
+  FETCH_CHATROOM_ERROR,
+  FETCH_MESSAGES_SUCCESS,
+  FETCH_MESSAGES_ERROR,
+  CREATE_MESSAGE_SUCCESS,
+  CREATE_MESSAGE_ERROR,
+  ADD_MESSAGE,
+} from "../actions/chatroom";
+import {
   LOGIN_ERROR,
   LOGIN_SUCCESS,
   SIGNUP_ERROR,
@@ -45,6 +54,10 @@ export default (store) => (next) => (action) => {
     case LOGIN_SUCCESS:
     case SIGNUP_SUCCESS:
     case LOGOUT:
+    case FETCH_CHATROOM_SUCCESS:
+    case FETCH_MESSAGES_SUCCESS:
+    case CREATE_MESSAGE_SUCCESS:
+    case ADD_MESSAGE:
       if (store.getState().error) store.dispatch(hideErrorClearTimeout());
       break;
 
@@ -60,6 +73,9 @@ export default (store) => (next) => (action) => {
     case FETCH_CANCEL_STATUS_ERROR:
     case LOGIN_ERROR:
     case SIGNUP_ERROR:
+    case FETCH_CHATROOM_ERROR:
+    case FETCH_MESSAGES_ERROR:
+    case CREATE_MESSAGE_ERROR:
       store.dispatch(showErrorWithTimeout(action.error));
       break;
 

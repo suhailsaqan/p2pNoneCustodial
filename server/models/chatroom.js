@@ -45,9 +45,8 @@ chatRoomSchema.statics.getChatRoomByRoomId = async function (roomId) {
 
 /**
  * @param {Array} userIds - array of strings of userIds
- * @param {CHAT_ROOM_TYPES} type
  */
-chatRoomSchema.statics.initiateChat = async function (users, type) {
+chatRoomSchema.statics.initiateChat = async function (users) {
   try {
     // const availableRoom = await this.findOne({
     //   userIds: {
@@ -65,11 +64,10 @@ chatRoomSchema.statics.initiateChat = async function (users, type) {
     //   };
     // }
 
-    const newRoom = await this.create({ users, type });
+    const newRoom = await this.create({ users });
     return {
       message: "creating a new chatroom",
       chatRoomId: newRoom._doc._id,
-      type: newRoom._doc.type,
     };
   } catch (error) {
     console.log("error on start chat method", error);
