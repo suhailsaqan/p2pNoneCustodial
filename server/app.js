@@ -15,7 +15,6 @@ const jwtStrategy = require("./auth/jwt");
 const expressValidator = require("express-validator");
 const config = require("./config");
 const bodyParser = require("body-parser");
-const Emitter = require("events");
 
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
@@ -29,23 +28,12 @@ app.use(passport.initialize());
 passport.use(localStrategy);
 passport.use(jwtStrategy);
 
-const eventEmitter = new Emitter();
-app.set("eventEmitter", eventEmitter);
+require("./eventEmitter")(app, io);
 
 require("./routes")(app);
 
 global.io = server.listen(config.port);
 
 const socketEvents = require("./socketEvents")(io);
-
-eventEmitter.on("new_message", (emit) => {
-  console.log("going to emit new_message");
-  io.to(emit.roomId).emit("new_message", emit.message);
-});
-
-eventEmitter.on("new_status", (emit) => {
-  console.log("going to emit new_status", emit);
-  io.to(emit.contractId).emit("new_status", emit.status);
-});
 
 module.exports = { server };

@@ -84,7 +84,7 @@ exports.getMessagesByRoomId = async (req, res, next) => {
       roomId,
       options
     );
-    console.log("recentConversation", recentConversation);
+    // console.log("recentConversation", recentConversation);
     res.status(200).json(recentConversation);
   } catch (err) {
     next(err);

@@ -113,8 +113,8 @@ chatMessageSchema.statics.createPostInChatRoom = async function (
         },
       },
     ]);
-    return aggregate;
-    // return post;
+    // return aggregate;
+    return post;
   } catch (error) {
     throw error;
   }
