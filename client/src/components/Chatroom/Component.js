@@ -7,47 +7,21 @@ import MessageListSection from "../MessageList";
 const Wrapper = styled.aside`
   display: flex;
   justify-content: center;
-  align-items: center;
-  max-height: 50%;
-  width: 50%;
-  border: 1px solid ${(props) => props.theme.border};
-  border-radius: 20px;
+  max-height: 30rem;
+  width: 30%;
+  border: 2px solid ${(props) => props.theme.border};
+  border-radius: 10px;
   background-color: ${(props) => props.theme.foreground};
-  overflow-y: scroll;
+
   flex-direction: column;
-
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  ::-webkit-scrollbar-corner {
-    background: #f1f1f1;
-  }
-
-  // @media (max-width: 768px) {
-  //   display: none;
-  // }
+  margin: 2rem;
 `;
-
-// Render this using `<ChatroomContainer id={match.params.post} />` similar to the client/src/components/Home/index.js
 
 class Chatroom extends React.Component {
   componentDidMount() {
     this.props.fetchChatroom(this.props.contract.chatroom_id);
     this.socket();
-    console.log("these are the messages", this.props.chatroom);
+    console.log("these are the messages", this.props.messages);
   }
 
   socket() {
@@ -58,7 +32,7 @@ class Chatroom extends React.Component {
         "new_message",
         msg,
         "this is the chatroom",
-        this.props.chatroom
+        this.props.messages
       );
       this.props.addMessage(msg);
     });
@@ -68,7 +42,7 @@ class Chatroom extends React.Component {
       console.log("closing");
       ev.preventDefault();
 
-      socket.emit("leave channel", {
+      socket.emit("leave_channel", {
         user: this.props.currentUser.id,
       });
     });
@@ -77,7 +51,7 @@ class Chatroom extends React.Component {
   render() {
     return (
       <Wrapper>
-        <MessageListSection messages={this.props.chatroom} />
+        <MessageListSection messages={this.props.messages} />
         <MessageFormContainer />
       </Wrapper>
     );

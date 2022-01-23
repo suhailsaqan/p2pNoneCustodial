@@ -27,12 +27,20 @@ const Par = styled.div`
   }
 `;
 
-const Wrapper = styled.div`
+const StatusWrapper = styled.div`
   align-items: center;
   display: flex;
   align-content: center;
   justify-content: center;
   flex-direction: column;
+`;
+
+const Wrapper = styled.div`
+  align-items: center;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-direction: row;
 `;
 
 class Party extends React.Component {
@@ -55,7 +63,7 @@ class Party extends React.Component {
       console.log("closing");
       ev.preventDefault();
 
-      socket.emit("leave channel", {
+      socket.emit("leave_channel", {
         user: this.props.currentUser.id,
       });
     });
@@ -106,66 +114,68 @@ class Party extends React.Component {
 
     return (
       <Wrapper>
-        {this.props.party == 1 && <Par>First Party</Par>}
-        {this.props.party == 2 && <Par>Second Party</Par>}
-        <Par>{contract.description}</Par>
-        {this.props.party == 1 && <Par>Current Status: {status_1}</Par>}
-        {this.props.party == 2 && <Par>Current Status: {status_2}</Par>}
-        {invoice_form && (
-          <InvoiceFormContainer id={contract._id} party={this.props.party} />
-        )}
-        {instructions && (
-          <div>
-            {instructions_invoiced && (
-              <Par>Your invoice has already been submitted</Par>
-            )}
-            {instructions_awaiting_counterparty_invoice && (
-              <Par>
-                Your counterparty needs to submit an invoice. Please wait.
-              </Par>
-            )}{" "}
-            {instructions_awaiting_counterparty_deposit && (
-              <Par>
-                Your counterparty needs to pay your invoice. Please wait.
-              </Par>
-            )}
-            {instructions_awaiting_settlement_invoice_submitted && (
-              <Par>The oracle will settle the contract soon.</Par>
-            )}
-            {instructions_awaiting_settlement_invoice_paid && (
-              <Par>
-                You have paid your invoice! The oracle will settle the contract
-                soon.
-              </Par>
-            )}
-          </div>
-        )}
-        {invoice_container && (
-          <div>
-            <Par>Please deposit funds to this invoice:</Par>
-            <QRCode value={hodl_invoice} />
-            <p>{hodl_invoice}</p>
-          </div>
-        )}
-        {payment_received && (
-          <Par>You received a payment from your counterparty. ✅</Par>
-        )}
-        {payment_sent && (
-          <Par>Your payment to your counterparty went through. ✅</Par>
-        )}
-        {payment_not_received && (
-          <Par>
-            A payment from your counterparty to you has been canceled by the
-            oracle. ❌
-          </Par>
-        )}
-        {payment_not_sent && (
-          <Par>
-            A payment from you to your counterparty has been canceled by the
-            oracle. ❌
-          </Par>
-        )}
-        {completion_message && <Par>This contract is complete 🎉</Par>}
+        <StatusWrapper>
+          {this.props.party == 1 && <Par>First Party</Par>}
+          {this.props.party == 2 && <Par>Second Party</Par>}
+          <Par>{contract.description}</Par>
+          {this.props.party == 1 && <Par>Current Status: {status_1}</Par>}
+          {this.props.party == 2 && <Par>Current Status: {status_2}</Par>}
+          {invoice_form && (
+            <InvoiceFormContainer id={contract._id} party={this.props.party} />
+          )}
+          {instructions && (
+            <div>
+              {instructions_invoiced && (
+                <Par>Your invoice has already been submitted</Par>
+              )}
+              {instructions_awaiting_counterparty_invoice && (
+                <Par>
+                  Your counterparty needs to submit an invoice. Please wait.
+                </Par>
+              )}{" "}
+              {instructions_awaiting_counterparty_deposit && (
+                <Par>
+                  Your counterparty needs to pay your invoice. Please wait.
+                </Par>
+              )}
+              {instructions_awaiting_settlement_invoice_submitted && (
+                <Par>The oracle will settle the contract soon.</Par>
+              )}
+              {instructions_awaiting_settlement_invoice_paid && (
+                <Par>
+                  You have paid your invoice! The oracle will settle the
+                  contract soon.
+                </Par>
+              )}
+            </div>
+          )}
+          {invoice_container && (
+            <div>
+              <Par>Please deposit funds to this invoice:</Par>
+              <QRCode value={hodl_invoice} />
+              <p>{hodl_invoice}</p>
+            </div>
+          )}
+          {payment_received && (
+            <Par>You received a payment from your counterparty. ✅</Par>
+          )}
+          {payment_sent && (
+            <Par>Your payment to your counterparty went through. ✅</Par>
+          )}
+          {payment_not_received && (
+            <Par>
+              A payment from your counterparty to you has been canceled by the
+              oracle. ❌
+            </Par>
+          )}
+          {payment_not_sent && (
+            <Par>
+              A payment from you to your counterparty has been canceled by the
+              oracle. ❌
+            </Par>
+          )}
+          {completion_message && <Par>This contract is complete 🎉</Par>}
+        </StatusWrapper>
         <ChatroomContainer />
       </Wrapper>
     );

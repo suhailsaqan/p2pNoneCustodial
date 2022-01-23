@@ -6,9 +6,8 @@ import DeleteButton from "../../shared/DeleteButton";
 
 const Wrapper = styled.div`
   display: flex;
-  border-bottom: 1px solid ${(props) => props.theme.border};
-  padding: 8px;
-  font-size: 13px;
+  padding: 0.2rem;
+  font-size: 0.9rem;
 `;
 
 class MessageDetail extends React.Component {

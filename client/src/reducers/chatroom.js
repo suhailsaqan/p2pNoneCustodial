@@ -11,14 +11,18 @@ import {
   ADD_MESSAGE,
 } from "../actions/chatroom";
 
-const initialState = { isFetching: false, messages: [] };
+const initialState = { isFetching: false, messages: [], lastpage: false };
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case FETCH_CHATROOM_REQUEST:
-      return { ...state, isFetching: true, chatroom: null };
+      return { ...state, isFetching: true, messages: null };
     case FETCH_CHATROOM_SUCCESS:
-      return { ...state, isFetching: false, chatroom: action.chatroom };
+      return {
+        ...state,
+        isFetching: false,
+        messages: action.messages,
+      };
     case FETCH_CHATROOM_ERROR:
       return { ...state, isFetching: false };
 
@@ -28,7 +32,9 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isFetching: false,
-        messages: state.chatroom.concat(action.messages),
+        messages: state.messages.concat(action.messages),
+        page: action.page,
+        lastpage: action.lastpage,
       };
     case FETCH_MESSAGES_ERROR:
       return { ...state, isFetching: false, error: action.error };
@@ -41,7 +47,8 @@ export default (state = initialState, action) => {
       return { ...state, isCreating: false, error: action.error };
 
     case ADD_MESSAGE:
-      return { ...state, chatroom: state.chatroom.concat(action.message) };
+      console.log("adding message", action.message);
+      return { ...state, messages: state.messages.concat(action.message) };
 
     default:
       return state;

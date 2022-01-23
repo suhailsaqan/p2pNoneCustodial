@@ -30,9 +30,9 @@ export const FETCH_CHATROOM_SUCCESS = "FETCH_CHATROOM_SUCCESS";
 export const FETCH_CHATROOM_ERROR = "FETCH_CHATROOM_ERROR";
 
 const fetchChatroomRequest = { type: FETCH_CHATROOM_REQUEST };
-const fetchChatroomSuccess = (chatroom) => ({
+const fetchChatroomSuccess = (messages) => ({
   type: FETCH_CHATROOM_SUCCESS,
-  chatroom,
+  messages,
 });
 const fetchChatroomError = (error) => ({ type: FETCH_CHATROOM_ERROR, error });
 
@@ -52,18 +52,33 @@ export const FETCH_MESSAGES_SUCCESS = "FETCH_MESSAGES_SUCCESS";
 export const FETCH_MESSAGES_ERROR = "FETCH_MESSAGES_ERROR";
 
 const fetchMessagesRequest = { type: FETCH_MESSAGES_REQUEST };
-const fetchMessagesSuccess = (messages) => ({
+const fetchMessagesSuccess = (messages, page, lastpage) => ({
   type: FETCH_MESSAGES_SUCCESS,
   messages,
+  page,
+  lastpage,
 });
 const fetchMessagesError = (error) => ({ type: FETCH_MESSAGES_ERROR, error });
 
-export const fetchMessages = (roomId, query) => async (dispatch, getState) => {
+export const fetchMessages = () => async (dispatch, getState) => {
   dispatch(fetchMessagesRequest);
   try {
+    console.log("fetching messages");
     const { token } = getState().auth;
-    const json = await getMessages(roomId, query, token);
-    dispatch(fetchMessagesSuccess(json));
+    const { contract } = getState().contracts;
+    const prevPage = getState().chatroom.page;
+    const page = parseInt(getState().chatroom.messages.length / 15);
+    if (page !== prevPage) {
+      const json = await getMessages(
+        contract.chatroom_id,
+        { page: page, limit: 15 },
+        token
+      );
+      console.log(json);
+      dispatch(fetchMessagesSuccess(json, page, false));
+    } else {
+      dispatch(fetchMessagesSuccess([], prevPage, true));
+    }
   } catch (error) {
     dispatch(fetchMessagesError(error));
   }

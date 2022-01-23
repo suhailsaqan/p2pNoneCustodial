@@ -520,13 +520,6 @@ exports.getCancelStatus = async (req, res, next) => {
 
     const cancelState = await getCancelStatus(party, contract);
 
-    const newStatus = await getBothStatus(0, contract);
-    const eventEmitter = req.app.get("eventEmitter");
-    eventEmitter.emit("new_status", {
-      contractId: id,
-      status: newStatus,
-    });
-
     return res.status(201).json(cancelState);
   } catch (err) {
     if (err.name === "CastError")

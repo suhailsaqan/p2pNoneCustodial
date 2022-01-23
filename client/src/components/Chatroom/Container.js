@@ -11,7 +11,6 @@ export const mapStateToProps = (state) => ({
   contract: state.contracts.contract,
   messages: state.chatroom.messages,
   isFetching: state.chatroom.isFetching,
-  chatroom: state.chatroom.chatroom,
   currentUser: state.auth.currentUser,
 });
 

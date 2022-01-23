@@ -1,37 +1,37 @@
-import React from 'react';
-import styled from 'styled-components/macro';
-import { Field } from 'redux-form';
-import Input from '../shared/form/Input';
+import React from "react";
+import styled from "styled-components/macro";
+import { Field } from "redux-form";
+import Input from "../shared/form/Input";
 
 const TextArea = styled(Input)`
   margin: 0;
   border: none;
-  border-bottom: 1px solid ${props => props.theme.border};
+  border-bottom: 1px solid ${(props) => props.theme.border};
   border-radius: 0;
   resize: none;
 
   :hover,
   :focus {
     border: none;
-    border-bottom: 1px solid ${props => props.theme.border};
+    border-bottom: 1px solid ${(props) => props.theme.border};
     box-shadow: none;
   }
 `;
 
 class MessageFormTextArea extends React.Component {
-  onKeyDown = e => {
+  onKeyDown = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
       this.props.onSubmit();
     }
   };
 
-  renderField = field => (
+  renderField = (field) => (
     <TextArea
-      as='textarea'
+      as="textarea"
       {...field.input}
-      placeholder='Enter a Message'
-      rows='2'
+      placeholder="Enter a Message"
+      rows="2"
       onKeyDown={this.onKeyDown}
     />
   );
