@@ -128,21 +128,37 @@ chatMessageSchema.statics.getConversationByRoomId = async function (
   options = {}
 ) {
   try {
+    // return this.aggregate([
+    //   { $match: { chatRoomId } },
+    //   { $sort: { createdAt: -1 } },
+    //   {
+    //     $lookup: {
+    //       from: "User",
+    //       localField: "userId",
+    //       foreignField: "_id",
+    //       as: "user",
+    //     },
+    //   },
+    //   // { $unwind: "$user" },
+    //   { $skip: options.page * options.limit },
+    //   { $limit: options.limit },
+    //   { $sort: { createdAt: 1 } },
+    // ]);
     return this.aggregate([
-      { $match: { chatRoomId } },
-      { $sort: { createdAt: -1 } },
+      { $match: { userId: "61e6879b4940d2dd6d0129b7" } },
+      // { $sort: { createdAt: -1 } },
       {
         $lookup: {
-          from: "User",
+          from: "users",
           localField: "userId",
           foreignField: "_id",
           as: "user",
         },
       },
-      // { $unwind: "$user" },
-      { $skip: options.page * options.limit },
-      { $limit: options.limit },
-      { $sort: { createdAt: 1 } },
+      { $unwind: "$user" },
+      // { $skip: options.page * options.limit },
+      // { $limit: options.limit },
+      // { $sort: { createdAt: 1 } },
     ]);
   } catch (error) {
     throw error;

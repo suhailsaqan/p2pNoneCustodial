@@ -1,7 +1,7 @@
 const makeValidation = require("@withvoid/make-validation");
 const ChatRoomModel = require("../models/chatroom");
 const ChatMessageModel = require("../models/chat_message");
-const User = require("../models/user");
+const UserModel = require("../models/user");
 
 checkUserInChatroom = async (chatroomId, userId) => {
   try {
@@ -67,6 +67,9 @@ exports.getMessagesByRoomId = async (req, res, next) => {
   try {
     const { roomId } = req.params;
     const currentLoggedUser = req.user.id;
+
+    const user = await UserModel.findById(currentLoggedUser);
+    console.log(user);
 
     if (!(await checkUserInChatroom(roomId, currentLoggedUser))) {
       console.log("user not in chatroom");
