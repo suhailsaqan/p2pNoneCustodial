@@ -16,7 +16,6 @@ const chatRoomSchema = new mongoose.Schema(
     collection: "chatrooms",
   }
 );
-
 /**
  * @param {String} userId - id of user
  * @return {Array} array of all chatroom that the user belongs to

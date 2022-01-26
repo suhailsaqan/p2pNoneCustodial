@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components/macro";
 import MessageDetailContainer from "./Detail/Container";
-import MessageContent from "./Content";
+import MessageContentContainer from "./Content/Container";
 
 const Wrapper = styled.div`
   border: 1px solid ${(props) => props.theme.border};
@@ -18,7 +18,9 @@ const Wrapper = styled.div`
 const Message = ({ message, ...details }) => (
   <Wrapper>
     <MessageDetailContainer {...details} />
-    <MessageContent>{message}</MessageContent>
+    <MessageContentContainer userId={details.userId}>
+      {message}
+    </MessageContentContainer>
   </Wrapper>
 );
 

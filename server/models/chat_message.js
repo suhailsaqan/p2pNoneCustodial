@@ -131,7 +131,15 @@ chatMessageSchema.statics.getConversationByRoomId = async function (
     return this.aggregate([
       { $match: { chatRoomId } },
       { $sort: { createdAt: -1 } },
-      // apply pagination
+      {
+        $lookup: {
+          from: "User",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      // { $unwind: "$user" },
       { $skip: options.page * options.limit },
       { $limit: options.limit },
       { $sort: { createdAt: 1 } },

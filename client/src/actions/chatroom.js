@@ -41,6 +41,7 @@ export const fetchChatroom = (id) => async (dispatch, getState) => {
   try {
     const { token } = getState().auth;
     const chatroom = await getChatroom(id, token);
+    console.log("chatroom", chatroom);
     dispatch(fetchChatroomSuccess(chatroom));
   } catch (error) {
     dispatch(fetchChatroomError(error));
