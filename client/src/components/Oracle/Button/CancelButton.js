@@ -27,22 +27,7 @@ const CancelButtonStyle = styled(Button)`
 
   :before {
     content: "";
-    background: linear-gradient(
-      // 45deg,
-      // #ff0000,
-      // #ff7300,
-      // #fffb00,
-      // #48ff00,
-      // #00ffd5,
-      // #002bff,
-      // #7a00ff,
-      // #ff00c8,
-      // #ff0000,
-      #f2a900,
-      #e6a100,
-      #ffbc1f,
-      #875f00
-    );
+    background: linear-gradient(#f2a900, #e6a100, #ffbc1f, #875f00);
     position: absolute;
     top: -2px;
     left: -2px;
