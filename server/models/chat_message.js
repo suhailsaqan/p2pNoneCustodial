@@ -145,7 +145,7 @@ chatMessageSchema.statics.getConversationByRoomId = async function (
     //   { $sort: { createdAt: 1 } },
     // ]);
     return this.aggregate([
-      { $match: { userId: "61e6879b4940d2dd6d0129b7" } },
+      { $match: { chatRoomId } },
       // { $sort: { createdAt: -1 } },
       {
         $lookup: {
@@ -155,7 +155,7 @@ chatMessageSchema.statics.getConversationByRoomId = async function (
           as: "user",
         },
       },
-      { $unwind: "$user" },
+      // { $unwind: "$user" },
       // { $skip: options.page * options.limit },
       // { $limit: options.limit },
       // { $sort: { createdAt: 1 } },
