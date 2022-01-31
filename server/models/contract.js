@@ -15,7 +15,19 @@ const STATUS_TYPES = {
 const contractSchema = new Schema({
   _id: { type: String, default: () => uuidv4().replace(/\-/g, "") },
   contract_name: { type: String, required: true },
-  status: {
+  status_1: {
+    type: String,
+    enum: [
+      STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT,
+      STATUS_TYPES.CONTRACT_PAID_AWAITING_SETTLEMENT,
+      STATUS_TYPES.CONTRACT_CANCELED,
+      STATUS_TYPES.CONTRACT_SETTLED,
+      STATUS_TYPES.WAITING_ON_OTHER_PARTY,
+      STATUS_TYPES.NEEDS_TO_PAY,
+      STATUS_TYPES.NEEDS_TO_SUBMIT_INVOICE,
+    ],
+  },
+  status_2: {
     type: String,
     enum: [
       STATUS_TYPES.CONTRACT_FUNDED_AWAITING_SETTLEMENT,
