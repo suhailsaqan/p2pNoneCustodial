@@ -80,6 +80,11 @@ exports.createContract = async (req, res, next) => {
     });
 
     const newStatus = await getBothStatus(0, contract);
+
+    contract.status_1 = newStatus["1"];
+    contract.status_2 = newStatus["2"];
+    await contract.save();
+
     const eventEmitter = req.app.get("eventEmitter");
     eventEmitter.emit("new_status", {
       contractId: contract.id,
@@ -402,6 +407,11 @@ exports.settleContract = async (req, res, next) => {
           await settleHoldInvoice(payment_preimage);
 
           const newStatus = await getBothStatus(0, contract);
+
+          contract.status_1 = newStatus["1"];
+          contract.status_2 = newStatus["2"];
+          await contract.save();
+
           const eventEmitter = req.app.get("eventEmitter");
           eventEmitter.emit("new_status", {
             contractId: id,
@@ -428,6 +438,11 @@ exports.settleContract = async (req, res, next) => {
           await settleHoldInvoice(payment_preimage);
 
           const newStatus = await getBothStatus(0, contract);
+
+          contract.status_1 = newStatus["1"];
+          contract.status_2 = newStatus["2"];
+          await contract.save();
+
           const eventEmitter = req.app.get("eventEmitter");
           eventEmitter.emit("new_status", {
             contractId: id,
@@ -548,6 +563,11 @@ exports.cancelContract = async (req, res, next) => {
     await cancelHoldInvoice(pmthash);
 
     const newStatus = await getBothStatus(0, contract);
+
+    contract.status_1 = newStatus["1"];
+    contract.status_2 = newStatus["2"];
+    await contract.save();
+
     const eventEmitter = req.app.get("eventEmitter");
     eventEmitter.emit("new_status", {
       contractId: id,
@@ -609,7 +629,11 @@ exports.addInvoice = async (req, res, next) => {
         // im not sure if saving it returns the new contract object or not, so i will re 'find' it
         const newContract = await Contract.findById(id);
         const newStatus = await getBothStatus(0, newContract);
-        console.log("newStatus", newStatus);
+
+        newContract.status_1 = newStatus["1"];
+        newContract.status_2 = newStatus["2"];
+        await newContract.save();
+
         const eventEmitter = req.app.get("eventEmitter");
         eventEmitter.emit("new_status", {
           contractId: id,
@@ -644,7 +668,11 @@ exports.addInvoice = async (req, res, next) => {
         // im not sure if saving it returns the new contract object or not, so i will re 'find' it
         const newContract = await Contract.findById(id);
         const newStatus = await getBothStatus(0, newContract);
-        console.log("newStatus", newStatus);
+
+        newContract.status_1 = newStatus["1"];
+        newContract.status_2 = newStatus["2"];
+        await newContract.save();
+
         const eventEmitter = req.app.get("eventEmitter");
         eventEmitter.emit("new_status", {
           contractId: id,
