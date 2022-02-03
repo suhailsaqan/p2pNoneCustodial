@@ -4,7 +4,6 @@ import MessageDetailContainer from "./Detail/Container";
 import MessageContentContainer from "./Content/Container";
 
 const Wrapper = styled.div`
-  border: 1px solid ${(props) => props.theme.border};
   border-radius: 10px;
   background-color: ${(props) => props.theme.foreground};
 
