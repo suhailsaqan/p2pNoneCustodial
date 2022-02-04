@@ -5,6 +5,7 @@ import ReactScrollableFeed from "react-scrollable-feed"; //https://github.com/di
 import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingIndicatorBox from "../../shared/LoadingIndicator/Box";
 import { ReallySimpleInfiniteScroll } from "react-really-simple-infinite-scroll";
+import { useVirtual } from "react-virtual";
 
 const Wrapper = styled.div`
   // margin-top: 16px;
@@ -40,6 +41,56 @@ const Wrapper = styled.div`
   }
 `;
 
+function RowVirtualizerFixed(messages) {
+  const parentRef = React.useRef();
+
+  const rowVirtualizer = useVirtual({
+    size: 10000,
+    parentRef,
+    estimateSize: React.useCallback(() => 35, []),
+    overscan: 5,
+  });
+
+  return (
+    <>
+      <div
+        ref={parentRef}
+        className="List"
+        style={{
+          height: `200px`,
+          width: `400px`,
+          overflow: "auto",
+        }}
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.totalSize}px`,
+            width: "100%",
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.virtualItems.map((virtualRow) => (
+            <div
+              key={virtualRow.index}
+              className={virtualRow.index % 2 ? "ListItemOdd" : "ListItemEven"}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: `${virtualRow.size}px`,
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              Row {virtualRow.index}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 class MessagesList extends React.Component {
   constructor(props) {
     super(props);
@@ -67,7 +118,7 @@ class MessagesList extends React.Component {
     return (
       <>
         {/* <ReactScrollableFeed forceScroll={true}> */}
-        {messages && (
+        {/* {messages && (
           <ReallySimpleInfiniteScroll
             key={true}
             className={`infinite-scroll`}
@@ -80,7 +131,8 @@ class MessagesList extends React.Component {
           >
             {this.mapMessages(this.sortMessages(messages))}
           </ReallySimpleInfiniteScroll>
-        )}
+        )} */}
+        {messages && <RowVirtualizerFixed />}
         {/* </ReactScrollableFeed> */}
       </>
     );
