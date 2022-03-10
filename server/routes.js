@@ -29,7 +29,7 @@ router.get("/settle/status/:id/:party", jwtAuth, contracts.getSettleStatus);
 router.post("/cancel", jwtAuth, contracts.cancelContract);
 router.get("/cancel/status/:id/:party", jwtAuth, contracts.getCancelStatus);
 router.post("/invoice", jwtAuth, contracts.addInvoice);
-router.get("/t/:id/:party", contracts.t);
+router.get("/t", contracts.t);
 
 // Chatroom routers
 router.get("/chatroom/:roomId", jwtAuth, chatroom.getMessagesByRoomId);
