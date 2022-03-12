@@ -271,29 +271,35 @@ exports.getStatus = async (req, res, next) => {
 exports.t = async (req, res, next) => {
   try {
     // TODO: check the status of the contract to be able to settle it
-    const { id, party } = req.params;
+    // const { id, party } = req.params;
 
-    const contract = await Contract.findById(id);
-    if (contract == null) {
-      return res.status(404).json({ message: "contract not found" });
-    }
+    // const contract = await Contract.findById(id);
+    // if (contract == null) {
+    //   return res.status(404).json({ message: "contract not found" });
+    // }
 
-    if (parseInt(party) == 1) {
-      pmthash = contract.first_party_pmthash;
-      invoiceDetails = await lookupInvoice(pmthash);
-      console.log(invoiceDetails);
+    // if (parseInt(party) == 1) {
+    //   pmthash = contract.first_party_pmthash;
+    //   invoiceDetails = await lookupInvoice(pmthash);
+    //   console.log(invoiceDetails);
 
-      if (!invoiceDetails.is_confirmed) {
-        console.log("confirmed");
-        original_invoice = contract.first_party_original;
-        paid = await sendPayment(
-          "lnbcrt500u1psaluuxpp5xtmevpgk65w7jccqdydn8ttw04q4n3cet9aj8wt7syzpj9pdfnpqdqqcqzpgsp5wl6h6zva0795sly9r8pk22e7z03jpx6y879fvvpshkzaq62gw68q9qyyssqgjj3avzafzhk5u5r9u43fssctruqt6gjukytz70xt4xdukaq2u93auqxayrcl8esl2xhwfsnxf80xhep9fkknqzqkx8qzzzhz3jgu9qpd7u55c",
-          1000,
-          15
-        );
-        console.log("paid:", paid);
-      }
-    }
+    //   if (!invoiceDetails.is_confirmed) {
+    //     console.log("confirmed");
+    //     original_invoice = contract.first_party_original;
+    //     paid = await sendPayment(
+    //       "lnbcrt500u1psaluuxpp5xtmevpgk65w7jccqdydn8ttw04q4n3cet9aj8wt7syzpj9pdfnpqdqqcqzpgsp5wl6h6zva0795sly9r8pk22e7z03jpx6y879fvvpshkzaq62gw68q9qyyssqgjj3avzafzhk5u5r9u43fssctruqt6gjukytz70xt4xdukaq2u93auqxayrcl8esl2xhwfsnxf80xhep9fkknqzqkx8qzzzhz3jgu9qpd7u55c",
+    //       1000,
+    //       15
+    //     );
+    //     console.log("paid:", paid);
+    //   }
+    // }
+    first_party_hodl = await createHoldInvoice(123, "first_party_pmthash", 1);
+    console.log(
+      "******************************************************",
+      first_party_hodl
+    );
+    return res.status(201).json(first_party_hodl);
   } catch (err) {
     if (err.name === "CastError")
       return res.status(400).json({ message: "invalid contract id" });
