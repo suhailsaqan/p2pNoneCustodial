@@ -8,7 +8,7 @@ const Wrapper = styled.aside`
   display: flex;
   justify-content: center;
   max-height: 30rem;
-  width: 30%;
+  // width: 30%;
   border: 2px solid ${(props) => props.theme.border};
   border-radius: 10px;
   background-color: ${(props) => props.theme.foreground};

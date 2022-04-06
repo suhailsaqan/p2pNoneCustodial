@@ -40,7 +40,7 @@ const Wrapper = styled.div`
   display: flex;
   align-content: center;
   justify-content: center;
-  flex-direction: row;
+  flex-direction: column;
 `;
 
 class Party extends React.Component {
